@@ -72,7 +72,7 @@ export function AppSidebar() {
                     <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold">
                         T
                     </div>
-                    <span className="font-semibold text-lg">Towner</span>
+                    <span className="font-semibold text-lg group-data-[collapsible=icon]:hidden">Towner</span>
                 </div>
             </SidebarHeader>
             <SidebarContent>
