@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Towner Admin Panel",
+  title: "Beubay Admin Panel",
   description: "Professional Admin Panel",
 };
 
