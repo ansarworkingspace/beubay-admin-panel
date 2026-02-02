@@ -77,6 +77,10 @@ export const sidebarData: SidebarData = {
                 {
                     title: "State",
                     url: "/dashboard/utility/state",
+                },
+                {
+                    title: "City",
+                    url: "/dashboard/utility/city",
                 }
             ]
         },
