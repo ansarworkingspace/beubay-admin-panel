@@ -1,16 +1,5 @@
 "use client"
 
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Separator } from "@/components/ui/separator"
-import { SidebarTrigger } from "@/components/ui/sidebar"
-import { ThemeSwitcher } from "@/components/theme-switcher"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Activity, CreditCard, DollarSign, Users } from "lucide-react"
 
@@ -71,26 +60,7 @@ const data = [
 export default function Page() {
   return (
     <>
-      <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4 w-full justify-between sticky top-0 bg-background/80 backdrop-blur-md z-10 transition-all duration-300 ease-in-out">
-        <div className="flex items-center gap-2">
-          <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="mr-2 h-4" />
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="#">
-                  Dashboard
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="hidden md:block" />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Overview</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </div>
-        <ThemeSwitcher />
-      </header>
+
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0 mt-4">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>

@@ -39,13 +39,8 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <ColorThemeProvider>
-            <SidebarProvider>
-              <AppSidebar />
-              <main className="w-full min-h-screen bg-background text-foreground group-has-[[data-collapsible=icon]]/sidebar-wrapper:pl-0 transition-all duration-300 ease-in-out">
-                {children}
-              </main>
-              <Toaster />
-            </SidebarProvider>
+            {children}
+            <Toaster />
           </ColorThemeProvider>
         </ThemeProvider>
       </body>

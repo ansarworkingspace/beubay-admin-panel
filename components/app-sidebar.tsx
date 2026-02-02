@@ -1,16 +1,8 @@
 "use client"
 
-import {
-    Calendar,
-    Home,
-    Inbox,
-    Search,
-    Settings,
-    Users,
-    BarChart,
-    FileText
-} from "lucide-react"
-
+import * as React from "react"
+import { sidebarData } from "@/data/sidebar-data"
+import { usePermissions } from "@/hooks/use-permissions"
 import {
     Sidebar,
     SidebarContent,
@@ -25,48 +17,13 @@ import {
     SidebarFooter
 } from "@/components/ui/sidebar"
 
-// Menu items.
-const items = [
-    {
-        title: "Dashboard",
-        url: "/",
-        icon: Home,
-    },
-    {
-        title: "Users",
-        url: "/users",
-        icon: Users,
-    },
-    {
-        title: "Analytics",
-        url: "/analytics",
-        icon: BarChart,
-    },
-    {
-        title: "Inbox",
-        url: "/inbox",
-        icon: Inbox,
-    },
-    {
-        title: "Documents",
-        url: "/documents",
-        icon: FileText,
-    },
-    {
-        title: "Calendar",
-        url: "/calendar",
-        icon: Calendar,
-    },
-    {
-        title: "Settings",
-        url: "/settings",
-        icon: Settings,
-    },
-]
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+    const { hasPermission } = usePermissions()
 
-export function AppSidebar() {
+    const navItems = sidebarData.navMain.filter(item => hasPermission(item.moduleId))
+
     return (
-        <Sidebar collapsible="icon">
+        <Sidebar collapsible="icon" {...props}>
             <SidebarHeader>
                 <div className="flex items-center gap-2 px-2 py-2">
                     <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold">
@@ -80,7 +37,7 @@ export function AppSidebar() {
                     <SidebarGroupLabel>Menu</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            {items.map((item) => (
+                            {navItems.map((item) => (
                                 <SidebarMenuItem key={item.title}>
                                     <SidebarMenuButton asChild tooltip={item.title}>
                                         <a href={item.url}>
@@ -95,7 +52,7 @@ export function AppSidebar() {
                 </SidebarGroup>
             </SidebarContent>
             <SidebarFooter>
-                {/* User profile could go here */}
+                {/* Footer content if needed */}
             </SidebarFooter>
             <SidebarRail />
         </Sidebar>
