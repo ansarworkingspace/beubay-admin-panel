@@ -203,7 +203,7 @@ export function CountryTable() {
                 )}
             </CardHeader>
 
-            <CardContent>
+            <CardContent className="space-y-4">
                 <DataTableToolbar
                     table={table}
                     searchKey="country_name"
