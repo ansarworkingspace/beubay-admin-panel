@@ -15,6 +15,7 @@ export interface NavItem {
         url: string;
     }[];
     moduleId?: string; // For permission checking
+    isActive?: boolean;
 }
 
 export interface SidebarData {
@@ -62,6 +63,18 @@ export const sidebarData: SidebarData = {
             url: "/dashboard/settings",
             icon: Settings2,
             moduleId: "settings",
+        },
+        {
+            title: "Utility",
+            url: "#",
+            icon: Bot, // Using Bot as placeholder, user didn't specify icon
+            moduleId: "utility",
+            items: [
+                {
+                    title: "Country",
+                    url: "/dashboard/utility/country",
+                }
+            ]
         },
     ],
 };

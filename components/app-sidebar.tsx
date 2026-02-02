@@ -16,8 +16,13 @@ import {
     SidebarHeader,
     SidebarRail,
     SidebarFooter,
-    SidebarMenuSkeleton
+    SidebarMenuSkeleton,
+    SidebarMenuSub,
+    SidebarMenuSubButton,
+    SidebarMenuSubItem
 } from "@/components/ui/sidebar"
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible"
+import { ChevronRight } from "lucide-react"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { hasPermission, loading } = usePermissions()
@@ -72,14 +77,45 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {navItems.map((item) => (
-                                <SidebarMenuItem key={item.title}>
-                                    <SidebarMenuButton asChild tooltip={item.title}>
-                                        <Link href={item.url}>
-                                            {item.icon && <item.icon />}
-                                            <span>{item.title}</span>
-                                        </Link>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
+                                <Collapsible
+                                    key={item.title}
+                                    asChild
+                                    defaultOpen={item.isActive}
+                                    className="group/collapsible"
+                                >
+                                    <SidebarMenuItem>
+                                        <CollapsibleTrigger asChild>
+                                            <SidebarMenuButton tooltip={item.title}>
+                                                {item.icon && <item.icon />}
+                                                {item.items && item.items.length > 0 ? (
+                                                    <>
+                                                        <span>{item.title}</span>
+                                                        <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                                                    </>
+                                                ) : (
+                                                    <Link href={item.url} className="flex-1 flex items-center gap-2">
+                                                        <span>{item.title}</span>
+                                                    </Link>
+                                                )}
+                                            </SidebarMenuButton>
+                                        </CollapsibleTrigger>
+                                        {item.items && item.items.length > 0 && (
+                                            <CollapsibleContent>
+                                                <SidebarMenuSub>
+                                                    {item.items.map((subItem) => (
+                                                        <SidebarMenuSubItem key={subItem.title}>
+                                                            <SidebarMenuSubButton asChild>
+                                                                <Link href={subItem.url}>
+                                                                    <span>{subItem.title}</span>
+                                                                </Link>
+                                                            </SidebarMenuSubButton>
+                                                        </SidebarMenuSubItem>
+                                                    ))}
+                                                </SidebarMenuSub>
+                                            </CollapsibleContent>
+                                        )}
+                                    </SidebarMenuItem>
+                                </Collapsible>
                             ))}
                         </SidebarMenu>
                     </SidebarGroupContent>
