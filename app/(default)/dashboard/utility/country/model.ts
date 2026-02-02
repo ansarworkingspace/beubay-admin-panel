@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const countrySchema = z.object({
-    country_name: z
+    name: z
         .string()
         .min(1, "Country name is required")
         .min(2, "Country name must be at least 2 characters")
@@ -13,20 +13,24 @@ export const countrySchema = z.object({
         .min(1, "Phone code is required")
         .regex(/^\+\d{1,4}$/, "Phone code must start with + followed by 1-4 digits (e.g., +1, +91)"),
 
-    currency_name: z
+    currency: z
         .string()
         .min(1, "Currency name is required")
         .min(2, "Currency name must be at least 2 characters")
         .max(50, "Currency name must not exceed 50 characters")
         .regex(/^[a-zA-Z\s]+$/, "Currency name must contain only letters and spaces"),
 
-    currency_code: z
+    currency_symbol: z
         .string()
-        .min(1, "Currency code is required")
-        .length(3, "Currency code must be exactly 3 characters (e.g., USD, INR)")
-        .regex(/^[A-Z]{3}$/, "Currency code must be 3 uppercase letters (e.g., USD, INR)"),
+        .min(1, "Currency symbol is required"),
 
-    status: z.enum(["active", "inactive"]),
+    country_code: z
+        .string()
+        .min(1, "Country code is required")
+        .length(3, "Country code must be exactly 3 characters (e.g., IND, USA)")
+        .regex(/^[A-Z]{3}$/, "Country code must be 3 uppercase letters"),
+
+    is_active: z.boolean().default(true),
 });
 
 export type CountryFormData = z.infer<typeof countrySchema>;
@@ -34,16 +38,15 @@ export type CountryFormData = z.infer<typeof countrySchema>;
 export interface CountryData {
     _id: string;
     id?: string;
-    country_name: string;
+    name: string;
     phone_code: string;
-    currency_code: string;
-    currency_name: string;
-    status: "active" | "inactive";
-    softDelete: boolean;
-    createdBy?: string;
-    updatedBy?: string;
-    createdAt: string;
-    updatedAt: string;
+    country_code: string;
+    currency: string;
+    currency_symbol: string;
+    is_active: boolean;
+    is_deleted: boolean;
+    created_at?: string;
+    updated_at?: string;
 }
 
 export interface PaginationInfo {
@@ -57,23 +60,16 @@ export interface PaginationInfo {
     prevPage: number | null;
 }
 
+// Controller returns response.data.data which is { data: [], pagination: {} }
 export interface CountriesListResponse {
-    success: boolean;
-    message: string;
     data: CountryData[];
     pagination: PaginationInfo;
-    timestamp: string;
 }
 
+// For single item responses if structure differs
 export interface CountryResponse {
     success: boolean;
     message: string;
     data: CountryData;
-    timestamp: string;
-}
-
-export interface DeleteCountryResponse {
-    success: boolean;
-    message: string;
-    timestamp: string;
+    timestamp?: string;
 }

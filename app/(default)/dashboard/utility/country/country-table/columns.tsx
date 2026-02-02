@@ -59,7 +59,7 @@ export function getColumns({
             enableColumnFilter: false,
             cell: ({ row }) => {
                 const toggleStatusMutation = useToggleCountryStatus();
-                const countryId = row.original._id || row.original.id; // Handle both
+                const countryId = row.original._id || row.original.id;
 
                 if (!countryId) {
                     return (
@@ -75,71 +75,65 @@ export function getColumns({
 
                 return (
                     <div className="flex items-center gap-2">
-                        {canView && (
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Link href={viewUrl}>
-                                            <Button variant="outline" size="icon" className="w-7 h-7">
-                                                <Eye className="w-4 h-4" />
-                                            </Button>
-                                        </Link>
-                                    </TooltipTrigger>
-                                    <TooltipContent side="top">
-                                        <p>View Country Details</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
-                        )}
-
-                        {canEdit && (
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Link href={editUrl}>
-                                            <Button variant="outline" size="icon" className="w-7 h-7">
-                                                <SquarePen className="w-4 h-4" />
-                                            </Button>
-                                        </Link>
-                                    </TooltipTrigger>
-                                    <TooltipContent side="top">
-                                        <p>Edit Country</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
-                        )}
-
-                        {canEdit && (
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button
-                                            variant="outline"
-                                            size="icon"
-                                            className={`w-15 h-7 ${row.original.status == 'active' ? "text-green-500 hover:text-green-600" : "text-red-500 hover:text-red-600"}`}
-                                            onClick={() => toggleStatusMutation.mutate(countryId)}
-                                            disabled={toggleStatusMutation.isPending}
-                                        >
-                                            {row.original.status == 'active' ? "Active" : "Inactive"}
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Link href={viewUrl}>
+                                        <Button variant="outline" size="icon" className="w-7 h-7">
+                                            <Eye className="w-4 h-4" />
                                         </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent side="top">
-                                        <p>{row.original.status == 'active' ? "Deactivate" : "Activate"}</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
-                        )}
+                                    </Link>
+                                </TooltipTrigger>
+                                <TooltipContent side="top">
+                                    <p>View Country Details</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Link href={editUrl}>
+                                        <Button variant="outline" size="icon" className="w-7 h-7">
+                                            <SquarePen className="w-4 h-4" />
+                                        </Button>
+                                    </Link>
+                                </TooltipTrigger>
+                                <TooltipContent side="top">
+                                    <p>Edit Country</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        size="icon"
+                                        className={`w-15 h-7 ${row.original.is_active ? "text-green-500 hover:text-green-600" : "text-red-500 hover:text-red-600"}`}
+                                        onClick={() => toggleStatusMutation.mutate(countryId)}
+                                        disabled={toggleStatusMutation.isPending}
+                                    >
+                                        {row.original.is_active ? "Active" : "Inactive"}
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="top">
+                                    <p>{row.original.is_active ? "Deactivate" : "Activate"}</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     </div>
                 );
             },
         },
         {
-            accessorKey: "country_name",
+            accessorKey: "name",
             header: ({ column }) => (
                 <DataTableColumnHeader column={column} title="Country Name" />
             ),
             cell: ({ row }) => (
-                <div className="font-medium min-w-[150px]">{row.original.country_name}</div>
+                <div className="font-medium min-w-[150px]">{row.original.name}</div>
             ),
             enableColumnFilter: true,
             meta: {
@@ -160,12 +154,12 @@ export function getColumns({
             },
         },
         {
-            accessorKey: "currency_name",
+            accessorKey: "currency",
             header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Currency Name" />
+                <DataTableColumnHeader column={column} title="Currency" />
             ),
             cell: ({ row }) => (
-                <div className="min-w-[100px]">{row.original.currency_name}</div>
+                <div className="min-w-[100px]">{row.original.currency} ({row.original.currency_symbol})</div>
             ),
             enableColumnFilter: true,
             meta: {
@@ -173,12 +167,12 @@ export function getColumns({
             },
         },
         {
-            accessorKey: "currency_code",
+            accessorKey: "country_code",
             header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Currency Code" />
+                <DataTableColumnHeader column={column} title="Country Code" />
             ),
             cell: ({ row }) => (
-                <div className="min-w-[80px] font-mono">{row.original.currency_code}</div>
+                <div className="min-w-[80px] font-mono">{row.original.country_code}</div>
             ),
             enableColumnFilter: true,
             meta: {
@@ -186,16 +180,16 @@ export function getColumns({
             },
         },
         {
-            accessorKey: "status",
+            accessorKey: "is_active",
             header: ({ column }) => (
                 <DataTableColumnHeader column={column} title="Status" />
             ),
             cell: ({ row }) => (
                 <Badge
-                    variant={row.original.status === 'active' ? "default" : "destructive"}
-                    className={row.original.status === 'active' ? "bg-green-100 text-green-800 hover:bg-green-200" : "bg-red-100 text-red-800 hover:bg-red-200"}
+                    variant={row.original.is_active ? "default" : "destructive"}
+                    className={row.original.is_active ? "bg-green-100 text-green-800 hover:bg-green-200" : "bg-red-100 text-red-800 hover:bg-red-200"}
                 >
-                    {row.original.status === 'active' ? "Active" : "Inactive"}
+                    {row.original.is_active ? "Active" : "Inactive"}
                 </Badge>
             ),
             enableColumnFilter: true,
@@ -203,8 +197,8 @@ export function getColumns({
                 filterType: "select",
                 filterOptions: [
                     { label: "All", value: "all" },
-                    { label: "Active", value: "active" },
-                    { label: "Inactive", value: "inactive" },
+                    { label: "Active", value: "true" },
+                    { label: "Inactive", value: "false" },
                 ],
             },
         }

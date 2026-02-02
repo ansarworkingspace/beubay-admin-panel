@@ -30,11 +30,8 @@ import { Error as ErrorComponent } from "@/components/ui/error";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Loading } from "@/components/ui/loading";
 import { useCountries } from "../controller";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { CountryData } from "../model";
-import { usePermissions } from "@/hooks/use-permissions";
-import { ACTIONS, MODULES } from "@/lib/constant";
 
 // Placeholder for missing components from user sample, if they don't exist in UI lib yet
 // TableHeaderCell removed, using TableHead instead
@@ -86,6 +83,9 @@ export function CountryTable() {
         isFetching,
         refetch
     } = useCountries(page, limit, memoizedSearchParams);
+
+    console.log("countriesResponse", countriesResponse);
+
 
     React.useEffect(() => {
         if (!isLoading && !countriesResponse) {
@@ -206,7 +206,7 @@ export function CountryTable() {
             <CardContent className="space-y-4">
                 <DataTableToolbar
                     table={table}
-                    searchKey="country_name"
+                    searchKey="name"
                     searchPlaceholder="Search countries..."
                     onToggleColumnFilters={() => setEnableColumnFilters(!enableColumnFilters)}
                     enableColumnFilters={enableColumnFilters}

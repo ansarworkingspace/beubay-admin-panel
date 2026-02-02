@@ -73,11 +73,12 @@ export const getCountryDetails = async (countryId: string) => {
         // Return both the form data structure AND the original data structure if needed
         // But the form expects specific fields.
         const result: CountryFormData & { _id: string, id: string } = {
-            country_name: data.data.country_name,
+            name: data.data.name,
             phone_code: data.data.phone_code,
-            currency_code: data.data.currency_code,
-            currency_name: data.data.currency_name,
-            status: data.data.status,
+            country_code: data.data.country_code,
+            currency: data.data.currency,
+            currency_symbol: data.data.currency_symbol,
+            is_active: data.data.is_active,
             _id: data.data._id,
             id: data.data._id
         };
@@ -110,7 +111,7 @@ export const getCountries = async (
     });
 
     const response = await api.get(`/admin/countries?${params.toString()}`);
-    return response.data;
+    return response.data.data;
 };
 
 // React Query Hook for getting countries (Table use)
