@@ -21,6 +21,7 @@ import {
     TableCell,
     TableHeader,
     TableRow,
+    TableHead,
 } from "@/components/ui/table";
 import { DataTablePagination } from "@/components/shared/table/data-table-pagination";
 import { DataTableToolbar } from "@/components/shared/table/data-table-toolbar";
@@ -36,7 +37,7 @@ import { usePermissions } from "@/hooks/use-permissions";
 import { ACTIONS, MODULES } from "@/lib/constant";
 
 // Placeholder for missing components from user sample, if they don't exist in UI lib yet
-const TableHeaderCell = ({ children, className, ...props }: any) => <th className={`h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 ${className}`} {...props}>{children}</th>;
+// TableHeaderCell removed, using TableHead instead
 
 
 export function CountryTable() {
@@ -227,17 +228,13 @@ export function CountryTable() {
                             {table.getHeaderGroups().map((headerGroup) => (
                                 <TableRow key={headerGroup.id}>
                                     {headerGroup.headers.map((header) => (
-                                        <TableHeaderCell
+                                        <TableHead
                                             key={header.id}
                                             colSpan={header.colSpan}
-                                            enableFilter={enableColumnFilters && header.column.getCanFilter()}
-                                            column={header.column as any}
-                                            onChange={handleSearchChange}
-                                            initialFilterValue={columnFilterValues[header.column.id] || ""}
                                             className="whitespace-nowrap"
                                         >
                                             {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                                        </TableHeaderCell>
+                                        </TableHead>
                                     ))}
                                 </TableRow>
                             ))}

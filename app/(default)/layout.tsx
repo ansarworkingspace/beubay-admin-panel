@@ -11,6 +11,7 @@ import {
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { UserNav } from "@/components/layout/user-nav"
+import { ModeToggle } from "@/components/mode-toggle"
 
 export default function DefaultLayout({
     children,
@@ -36,6 +37,7 @@ export default function DefaultLayout({
                         </BreadcrumbList>
                     </Breadcrumb>
                     <div className="ml-auto flex items-center gap-2">
+                        <ModeToggle />
                         <UserNav />
                     </div>
                 </header>
