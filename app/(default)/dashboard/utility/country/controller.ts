@@ -14,7 +14,7 @@ export const useCreateCountryMutation = () => {
                 "/admin/countries",
                 formData
             );
-            if (!data.success)
+            if (data.status !== "success" && !(data as any).success)
                 throw new Error(data.message || "Failed to create country");
             return data.data;
         },
@@ -42,7 +42,7 @@ export const useUpdateCountryMutation = (countryId: string) => {
                 `/admin/countries/${countryId}`,
                 formData
             );
-            if (!data.success)
+            if (data.status !== "success" && !(data as any).success)
                 throw new Error(data.message || "Failed to update country");
             return data.data;
         },

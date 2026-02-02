@@ -68,7 +68,8 @@ export interface CountriesListResponse {
 
 // For single item responses if structure differs
 export interface CountryResponse {
-    success: boolean;
+    status: string; // Changed from success: boolean
+    success?: boolean; // Keep optional for backward compat if needed
     message: string;
     data: CountryData;
     timestamp?: string;

@@ -18,38 +18,24 @@ import { Loading } from "@/components/ui/loading";
 import { Pencil, ArrowLeft } from "lucide-react";
 import { getCountryDetails } from "../../controller";
 import { CountryFormData } from "../../model";
+import { useQuery } from "@tanstack/react-query";
 
 const ViewCountry = () => {
     const params = useParams();
     const router = useRouter();
     const id = params.id as string;
 
-    const [country, setCountry] = useState<(CountryFormData & { _id: string, id: string }) | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    // Use useQuery for data fetching with caching
+    const { data: country, isLoading, error: queryError } = useQuery({
+        queryKey: ['country', id],
+        queryFn: () => getCountryDetails(id),
+        enabled: !!id
+    });
 
-    useEffect(() => {
-        if (id) {
-            const fetchCountry = async () => {
-                try {
-                    const data = await getCountryDetails(id);
-                    if (data) {
-                        setCountry(data);
-                    } else {
-                        setError("Country not found");
-                    }
-                } catch (err) {
-                    console.error(err);
-                    setError("Failed to load country details");
-                } finally {
-                    setLoading(false);
-                }
-            };
-            fetchCountry();
-        }
-    }, [id]);
+    // Convert error to string if present
+    const error = queryError instanceof Error ? queryError.message : (queryError as unknown as string);
 
-    if (loading) return <FormContainer><Loading /></FormContainer>;
+    if (isLoading) return <FormContainer><Loading /></FormContainer>;
     if (error || !country) return <FormContainer><ErrorComponent message={error || "Country not found"} /></FormContainer>;
 
     return (
@@ -63,14 +49,14 @@ const ViewCountry = () => {
 
             <FormTitleCard
                 title="Country Details"
-                description={`View details for ${country.country_name}`}
+                description={`View details for ${country.name}`}
             />
 
             <div className="space-y-6">
                 <FormSection title="Basic Information">
                     <FormRowTwo>
                         <FormField label="Country Name">
-                            <Input value={country.country_name} readOnly className="bg-muted" />
+                            <Input value={country.name} readOnly className="bg-muted" />
                         </FormField>
                         <FormField label="Phone Code">
                             <Input value={country.phone_code} readOnly className="bg-muted" />
@@ -78,22 +64,25 @@ const ViewCountry = () => {
                     </FormRowTwo>
 
                     <FormRowTwo>
-                        <FormField label="Currency Name">
-                            <Input value={country.currency_name} readOnly className="bg-muted" />
+                        <FormField label="Currency">
+                            <Input value={country.currency} readOnly className="bg-muted" />
                         </FormField>
-                        <FormField label="Currency Code">
-                            <Input value={country.currency_code} readOnly className="bg-muted" />
+                        <FormField label="Currency Symbol">
+                            <Input value={country.currency_symbol} readOnly className="bg-muted" />
                         </FormField>
                     </FormRowTwo>
 
                     <FormRowTwo>
+                        <FormField label="Country Code">
+                            <Input value={country.country_code} readOnly className="bg-muted" />
+                        </FormField>
                         <FormField label="Status">
                             <div className="flex items-center h-10">
                                 <Badge
-                                    variant={country.status === 'active' ? "default" : "destructive"}
-                                    className={country.status === 'active' ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}
+                                    variant={country.is_active ? "default" : "destructive"}
+                                    className={country.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}
                                 >
-                                    {country.status === 'active' ? "Active" : "Inactive"}
+                                    {country.is_active ? "Active" : "Inactive"}
                                 </Badge>
                             </div>
                         </FormField>

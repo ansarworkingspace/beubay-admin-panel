@@ -49,7 +49,7 @@ interface FormFieldProps {
 
 interface FormActionsProps {
   onCancel: () => void;
-  onSubmit: () => void;
+  onSubmit?: () => void;
   isLoading?: boolean;
   isEdit?: boolean;
   cancelText?: string;

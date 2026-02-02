@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "@tanstack/react-query";
 
 import {
     FormActions,
@@ -39,8 +40,6 @@ const CountryForm = () => {
 
     const isEdit = slug !== "add";
     const countryId = isEdit ? slug : null;
-    const [dataLoading, setDataLoading] = useState(isEdit);
-    const [dataError, setDataError] = useState<string | null>(null);
 
     const createCountryMutation = useCreateCountryMutation();
     const updateCountryMutation = useUpdateCountryMutation(countryId ?? "");
@@ -53,46 +52,37 @@ const CountryForm = () => {
         reset,
         formState: { errors },
     } = useForm<CountryFormData>({
-        resolver: zodResolver(countrySchema),
+        resolver: zodResolver(countrySchema) as any,
         defaultValues: {
-            country_name: "",
+            name: "",
             phone_code: "",
-            currency_name: "",
-            currency_code: "",
-            status: "active",
+            currency: "",
+            currency_symbol: "",
+            country_code: "", // added default
+            is_active: true, // boolean as per new model
         },
     });
 
-    // Fetch country data for edit mode
+    // Use useQuery for data fetching with caching
+    const { data: countryData, isLoading: dataLoading, error: queryError } = useQuery({
+        queryKey: ['country', countryId],
+        queryFn: () => getCountryDetails(countryId!),
+        enabled: isEdit && !!countryId
+    });
+
+    const dataError = queryError instanceof Error ? queryError.message : (queryError as unknown as string);
+
+    // Populate form when data is loaded
     useEffect(() => {
-        if (isEdit && countryId) {
-            setDataLoading(true);
-            setDataError(null);
-
-            const fetchCountryDetails = async () => {
-                try {
-                    const countryData = await getCountryDetails(countryId);
-                    if (!countryData) {
-                        router.push("/dashboard/utility/country");
-                        return;
-                    }
-
-                    setValue("country_name", countryData.country_name);
-                    setValue("phone_code", countryData.phone_code);
-                    setValue("currency_name", countryData.currency_name);
-                    setValue("currency_code", countryData.currency_code);
-                    setValue("status", countryData.status);
-                } catch (error) {
-                    setDataError("Error loading country data");
-                    console.error("Error fetching country details:", error);
-                } finally {
-                    setDataLoading(false);
-                }
-            };
-
-            fetchCountryDetails();
+        if (countryData) {
+            setValue("name", countryData.name);
+            setValue("phone_code", countryData.phone_code);
+            setValue("currency", countryData.currency);
+            setValue("currency_symbol", countryData.currency_symbol);
+            setValue("country_code", countryData.country_code);
+            setValue("is_active", countryData.is_active);
         }
-    }, [isEdit, countryId, setValue, router]);
+    }, [countryData, setValue]);
 
     const onSubmit = async (data: CountryFormData) => {
         try {
@@ -111,7 +101,7 @@ const CountryForm = () => {
         router.push("/dashboard/utility/country");
     };
 
-    if (dataLoading) {
+    if (isEdit && dataLoading) {
         return (
             <FormContainer>
                 <Loading />
@@ -119,10 +109,10 @@ const CountryForm = () => {
         );
     }
 
-    if (dataError) {
+    if (isEdit && (dataError || (!dataLoading && !countryData))) {
         return (
             <FormContainer>
-                <ErrorComponent message={dataError} />
+                <ErrorComponent message={dataError || "Country not found"} />
             </FormContainer>
         );
     }
@@ -147,22 +137,22 @@ const CountryForm = () => {
                 }
             />
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={handleSubmit(onSubmit as any)} className="space-y-6">
                 <FormSection
                     title="Country Information"
                     description="Basic details about the country"
                 >
                     <FormRowTwo>
                         <FormField
-                            error={errors.country_name?.message}
+                            error={errors.name?.message}
                             label="Country Name"
                             required
                         >
                             <Input
                                 type="text"
-                                id="country_name"
+                                id="name"
                                 placeholder="Enter country name"
-                                {...register("country_name", {
+                                {...register("name", {
                                     required: "Country name is required"
                                 })}
                                 onInput={(e) => {
@@ -206,15 +196,15 @@ const CountryForm = () => {
 
                     <FormRowTwo>
                         <FormField
-                            error={errors.currency_name?.message}
+                            error={errors.currency?.message}
                             label="Currency Name"
                             required
                         >
                             <Input
                                 type="text"
-                                id="currency_name"
+                                id="currency"
                                 placeholder="Enter currency name (e.g., Indian Rupee)"
-                                {...register("currency_name", {
+                                {...register("currency", {
                                     required: "Currency name is required",
                                 })}
                                 onInput={(e) => {
@@ -227,20 +217,38 @@ const CountryForm = () => {
                         </FormField>
 
                         <FormField
-                            error={errors.currency_code?.message}
-                            label="Currency Code"
+                            error={errors.currency_symbol?.message}
+                            label="Currency Symbol"
                             required
                         >
                             <Input
                                 type="text"
-                                id="currency_code"
-                                placeholder="Enter currency code (e.g., INR)"
+                                id="currency_symbol"
+                                placeholder="Enter currency symbol (e.g., ₹)"
                                 maxLength={4}
-                                {...register("currency_code", {
-                                    required: "Currency code is required",
+                                {...register("currency_symbol", {
+                                    required: "Currency symbol is required"
+                                })}
+                            />
+                        </FormField>
+                    </FormRowTwo>
+
+                    <FormRowTwo>
+                        <FormField
+                            error={errors.country_code?.message}
+                            label="Country Code"
+                            required
+                        >
+                            <Input
+                                type="text"
+                                id="country_code"
+                                placeholder="Enter country code (e.g., IN)"
+                                maxLength={3}
+                                {...register("country_code", {
+                                    required: "Country code is required",
                                     pattern: {
-                                        value: /^[A-Za-z]{2,4}$/,
-                                        message: "Enter 2-4 alphabet characters only (e.g., INR)",
+                                        value: /^[A-Za-z]{2,3}$/,
+                                        message: "Enter 2-3 alphabet characters only (e.g., IN)",
                                     },
                                 })}
                                 onInput={(e) => {
@@ -250,33 +258,32 @@ const CountryForm = () => {
                                 }}
                             />
                         </FormField>
+
+                        {isEdit && (
+                            <FormField error={errors.is_active?.message} label="Status" required>
+                                <Select
+                                    onValueChange={(value: string) => {
+                                        // Handle string "true"/"false" from Select back to boolean
+                                        setValue("is_active", value === 'true');
+                                    }}
+                                    value={watch("is_active") ? "true" : "false"}
+                                >
+                                    <SelectTrigger id="is_active" className="w-full">
+                                        <SelectValue placeholder="Select status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="true">Active</SelectItem>
+                                        <SelectItem value="false">Inactive</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </FormField>
+                        )}
+                        {!isEdit && <div></div>}
                     </FormRowTwo>
-
-                    {isEdit && <FormRowTwo>
-                        <FormField error={errors.status?.message} label="Status" required>
-                            <Select
-                                onValueChange={(value: "active" | "inactive") =>
-                                    setValue("status", value)
-                                }
-                                value={watch("status")}
-                            >
-                                <SelectTrigger id="status" className="w-full">
-                                    <SelectValue placeholder="Select status" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="active">Active</SelectItem>
-                                    <SelectItem value="inactive">Inactive</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </FormField>
-
-                        <div></div>
-                    </FormRowTwo>}
                 </FormSection>
 
                 <FormActions
                     onCancel={handleCancel}
-                    onSubmit={handleSubmit(onSubmit)}
                     isLoading={
                         createCountryMutation.isPending || updateCountryMutation.isPending
                     }
