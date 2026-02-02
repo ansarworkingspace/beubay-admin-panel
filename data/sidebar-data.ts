@@ -3,7 +3,12 @@ import {
     Bot,
     Settings2,
     Users,
-    LayoutDashboard
+    LayoutDashboard,
+    Store,
+    Scissors,
+    CalendarDays,
+    Star,
+    ChartPie
 } from "lucide-react";
 
 export interface NavItem {
@@ -47,21 +52,45 @@ export const sidebarData: SidebarData = {
     ],
     navMain: [
         {
-            title: "Dashboard",
+            title: "Overview",
             url: "/dashboard",
             icon: LayoutDashboard,
             moduleId: "dashboard",
         },
         {
-            title: "Staff",
+            title: "Saloon Management",
             url: "/dashboard/staff",
-            icon: Users,
+            icon: Store,
             moduleId: "staff", // Requires 'staff' permission
         },
         {
-            title: "Settings",
+            title: "Service Management",
             url: "/dashboard/settings",
-            icon: Settings2,
+            icon: Scissors,
+            moduleId: "settings",
+        },
+        {
+            title: "Stylist Management",
+            url: "/dashboard/settings",
+            icon: Users,
+            moduleId: "settings",
+        },
+        {
+            title: "Booking Management",
+            url: "/dashboard/settings",
+            icon: CalendarDays,
+            moduleId: "settings",
+        },
+        {
+            title: "Ratings & Reviews",
+            url: "/dashboard/settings",
+            icon: Star,
+            moduleId: "settings",
+        },
+        {
+            title: "Reports",
+            url: "/dashboard/settings",
+            icon: ChartPie,
             moduleId: "settings",
         },
         {
@@ -81,6 +110,14 @@ export const sidebarData: SidebarData = {
                 {
                     title: "City",
                     url: "/dashboard/utility/city",
+                },
+                {
+                    title: "Service Category",
+                    url: "/dashboard/utility/service-category",
+                },
+                {
+                    title: "Salon Category",
+                    url: "/dashboard/utility/salon-category",
                 }
             ]
         },
