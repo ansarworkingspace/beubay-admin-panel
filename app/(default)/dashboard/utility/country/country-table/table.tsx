@@ -177,8 +177,8 @@ export function CountryTable() {
     const hasActiveFilters = Object.keys(searchParamsState).length > 0;
 
     return (
-        <Card className="border-none shadow-none">
-            <CardHeader className="px-0 pt-0">
+        <Card>
+            <CardHeader className="border-b mb-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         {isFetching && (
@@ -192,7 +192,7 @@ export function CountryTable() {
                     </div>
                 </div>
                 {hasActiveFilters && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
                         <button
                             onClick={clearFilters}
                             className="text-primary hover:underline"
@@ -203,7 +203,7 @@ export function CountryTable() {
                 )}
             </CardHeader>
 
-            <CardContent className="p-0 space-y-4">
+            <CardContent>
                 <DataTableToolbar
                     table={table}
                     searchKey="country_name"
