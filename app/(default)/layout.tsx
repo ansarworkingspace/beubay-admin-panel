@@ -10,6 +10,7 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
+import { UserNav } from "@/components/layout/user-nav"
 
 export default function DefaultLayout({
     children,
@@ -34,6 +35,9 @@ export default function DefaultLayout({
                             </BreadcrumbItem>
                         </BreadcrumbList>
                     </Breadcrumb>
+                    <div className="ml-auto flex items-center gap-2">
+                        <UserNav />
+                    </div>
                 </header>
                 <div className="p-4">
                     {children}
