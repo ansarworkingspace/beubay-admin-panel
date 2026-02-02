@@ -6,6 +6,7 @@ import { ColorThemeProvider } from "@/components/providers/color-theme-provider"
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import { AppSidebar } from "@/components/app-sidebar";
+import { ReactQueryProvider } from "@/components/providers/react-query-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,8 +40,10 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <ColorThemeProvider>
-            {children}
-            <Toaster />
+            <ReactQueryProvider>
+              {children}
+              <Toaster />
+            </ReactQueryProvider>
           </ColorThemeProvider>
         </ThemeProvider>
       </body>

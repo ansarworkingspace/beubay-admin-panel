@@ -47,7 +47,7 @@ export const sidebarData: SidebarData = {
     navMain: [
         {
             title: "Dashboard",
-            url: "/", // Root of default
+            url: "/dashboard",
             icon: LayoutDashboard,
             moduleId: "dashboard",
         },

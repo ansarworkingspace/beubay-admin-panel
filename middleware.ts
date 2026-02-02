@@ -2,127 +2,117 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { jwtDecode } from 'jwt-decode';
 
-// Define public routes
+// Define public routes (although matcher handles most, this is a safety check)
 const publicRoutes = ['/login', '/unauthorized'];
 
 interface CustomJwtPayload {
     is_super_admin?: boolean;
-    permissions?: string[];
+    permissions?: { moduleName: string;[key: string]: any }[];
     exp?: number;
 }
 
-// Map paths to module IDs for permission checking
-const pathModuleMap: Record<string, string> = {
-    '/dashboard/staff': 'staff',
-    '/dashboard/settings': 'settings',
-    // Add more mappings here
-};
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api/v1';
+
+async function handleTokenRefresh(request: NextRequest, refreshToken: string): Promise<NextResponse> {
+    try {
+        const response = await fetch(`${API_BASE_URL}/admin/auth/refresh-token`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ refreshToken }),
+        });
+
+        const data = await response.json();
+        console.log("Middleware Refresh Response:", { status: response.status, data });
+
+        // Handle various response structures
+        // Log confirms structure: { data: { accessToken: "...", refreshToken: "..." } }
+        let newAccessToken = data.token || data.accessToken || data.data?.token || data.data?.accessToken;
+        let newRefreshToken = data.refreshToken || data.data?.refreshToken;
+
+        if (response.ok && newAccessToken) {
+            // Use redirect instead of next() to ensure the browser re-requests with the new cookies attached.
+            // This avoids race conditions where the server component renders without the token.
+            const res = NextResponse.redirect(request.url);
+
+            // Update cookies
+            res.cookies.set('access_token', newAccessToken, {
+                path: '/',
+                maxAge: 60 * 60 * 24, // 1 day
+                sameSite: 'lax'
+            });
+
+            if (newRefreshToken) {
+                res.cookies.set('refresh_token', newRefreshToken, {
+                    path: '/',
+                    maxAge: 60 * 60 * 24 * 7, // 7 days
+                    sameSite: 'lax'
+                });
+            }
+
+            return res;
+        } else {
+            console.error("Middleware Refresh Failed: Invalid response or missing token");
+            return NextResponse.redirect(new URL('/login', request.url));
+        }
+
+    } catch (error) {
+        console.error("Middleware Refresh Error:", error);
+        return NextResponse.redirect(new URL('/login', request.url));
+    }
+}
 
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
-    // 1. Check if route is public
-    if (publicRoutes.some(route => pathname.startsWith(route))) {
+    // STRICT CHECK: Only protect dashboard routes
+    // The matcher in config handles this mostly, but good to be explicit.
+    if (!pathname.startsWith('/dashboard')) {
         return NextResponse.next();
     }
 
-    // 2. Get tokens from cookies
-    const accessToken = request.cookies.get('access_token')?.value;
-    const refreshToken = request.cookies.get('refresh_token')?.value;
+    // 1. Get tokens from cookies
+    // 1. Get tokens from cookies (support both hyphen and underscore)
+    const accessToken = request.cookies.get('access_token')?.value || request.cookies.get('access-token')?.value;
+    const refreshToken = request.cookies.get('refresh_token')?.value || request.cookies.get('refresh-token')?.value;
 
-    // 3. Handle missing tokens
+    // 2. Handle missing tokens
     if (!accessToken) {
         if (refreshToken) {
-            // Logic to refresh token would go here.
-            // For this MVP/Architecture, we'll assume we can't easily refresh in middleware without a real backend endpoint to call 
-            // ensuring we don't stall the request. 
-            // If we had a real backend, we might fetch(refresh_url) here.
-            // For now, if access token is missing but refresh exists, we realistically should redirect to login 
-            // unless we implement the actual refresh fetch. 
-            // User asked to "Auto-Refresh ... call backend".
-            // Let's implement a placeholder for that logic:
-
-            /*
-            try {
-              const refreshResponse = await fetch('http://localhost:3000/api/v1/admin/auth/refresh-token', {
-                   method: 'POST', body: JSON.stringify({ token: refreshToken }) 
-              });
-              if (refreshResponse.ok) {
-                 // Set new cookies and retry
-                 const data = await refreshResponse.json();
-                 const response = NextResponse.redirect(request.url);
-                 response.cookies.set('access_token', data.accessToken);
-                 return response;
-              }
-            } catch(e) {}
-            */
-
-            // Since we don't have the backend running yet, this fetch would fail.
-            // We will redirect to login to be safe.
-            const url = request.nextUrl.clone();
-            url.pathname = '/login';
-            return NextResponse.redirect(url);
+            return await handleTokenRefresh(request, refreshToken);
         } else {
-            // No tokens at all
-            const url = request.nextUrl.clone();
-            url.pathname = '/login';
-            return NextResponse.redirect(url);
+            return NextResponse.redirect(new URL('/login', request.url));
         }
     }
 
-    // 4. Validate and Authorize
+    // 3. Validate and Authorize
     try {
         const decoded = jwtDecode<CustomJwtPayload>(accessToken);
 
-        // Check expiration (optional if exp is present)
+        // Check expiration
         const currentTime = Date.now() / 1000;
         if (decoded.exp && decoded.exp < currentTime) {
-            // Token expired
-            // Try refresh logic (omitted for brevity, same as above)
-            const url = request.nextUrl.clone();
-            url.pathname = '/login';
-            return NextResponse.redirect(url);
+            if (refreshToken) {
+                return await handleTokenRefresh(request, refreshToken);
+            }
+            return NextResponse.redirect(new URL('/login', request.url));
         }
 
-        // RBAC Check
+        // CHECK SUPER ADMIN
         if (decoded.is_super_admin) {
             return NextResponse.next();
+        } else {
+            // Not super admin -> Unauthorized for dashboard access until further permissions implemented
+            return NextResponse.redirect(new URL('/unauthorized', request.url));
         }
-
-        // Check specific module permissions
-        // Find the matching module for the current path
-        const matchedModule = Object.keys(pathModuleMap).find(route => pathname.startsWith(route));
-        if (matchedModule) {
-            const moduleId = pathModuleMap[matchedModule];
-            const userPermissions = decoded.permissions || [];
-
-            if (!userPermissions.includes(moduleId)) {
-                // Unauthorized
-                const url = request.nextUrl.clone();
-                url.pathname = '/unauthorized';
-                return NextResponse.redirect(url);
-            }
-        }
-
-        return NextResponse.next();
 
     } catch (error) {
-        // If token is invalid
-        const url = request.nextUrl.clone();
-        url.pathname = '/login';
-        return NextResponse.redirect(url);
+        return NextResponse.redirect(new URL('/login', request.url));
     }
 }
 
 export const config = {
-    matcher: [
-        /*
-         * Match all request paths except for the ones starting with:
-         * - api (API routes)
-         * - _next/static (static files)
-         * - _next/image (image optimization files)
-         * - favicon.ico (favicon file)
-         */
-        '/((?!api|_next/static|_next/image|favicon.ico).*)',
-    ],
+    // Only invoke middleware on dashboard routes
+    matcher: ["/dashboard/:path*"],
 };
