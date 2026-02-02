@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
 import { sidebarData } from "@/data/sidebar-data"
 import { usePermissions } from "@/hooks/use-permissions"
 import {
@@ -14,13 +15,46 @@ import {
     SidebarMenuItem,
     SidebarHeader,
     SidebarRail,
-    SidebarFooter
+    SidebarFooter,
+    SidebarMenuSkeleton
 } from "@/components/ui/sidebar"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-    const { hasPermission } = usePermissions()
+    const { hasPermission, loading } = usePermissions()
 
-    const navItems = sidebarData.navMain.filter(item => hasPermission(item.moduleId))
+    const navItems = React.useMemo(() => {
+        if (loading) return [];
+        return sidebarData.navMain.filter(item => hasPermission(item.moduleId));
+    }, [loading, hasPermission]);
+
+    if (loading) {
+        return (
+            <Sidebar collapsible="icon" {...props}>
+                <SidebarHeader>
+                    {/* Skeleton Header */}
+                    <div className="flex items-center gap-2 px-2 py-2">
+                        <div className="h-8 w-8 rounded-md bg-muted animate-pulse" />
+                        <div className="h-4 w-20 bg-muted animate-pulse rounded group-data-[collapsible=icon]:hidden" />
+                    </div>
+                </SidebarHeader>
+                <SidebarContent>
+                    <SidebarGroup>
+                        <SidebarGroupLabel>Menu</SidebarGroupLabel>
+                        <SidebarGroupContent>
+                            <SidebarMenu>
+                                {[1, 2, 3, 4].map((i) => (
+                                    <SidebarMenuItem key={i}>
+                                        <SidebarMenuSkeleton showIcon />
+                                    </SidebarMenuItem>
+                                ))}
+                            </SidebarMenu>
+                        </SidebarGroupContent>
+                    </SidebarGroup>
+                </SidebarContent>
+                <SidebarRail />
+            </Sidebar>
+        );
+    }
 
     return (
         <Sidebar collapsible="icon" {...props}>
@@ -40,10 +74,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             {navItems.map((item) => (
                                 <SidebarMenuItem key={item.title}>
                                     <SidebarMenuButton asChild tooltip={item.title}>
-                                        <a href={item.url}>
-                                            <item.icon />
+                                        <Link href={item.url}>
+                                            {item.icon && <item.icon />}
                                             <span>{item.title}</span>
-                                        </a>
+                                        </Link>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
                             ))}
