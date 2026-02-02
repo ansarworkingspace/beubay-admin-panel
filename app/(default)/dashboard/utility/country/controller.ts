@@ -102,11 +102,9 @@ export const getCountries = async (
         limit: limit.toString(),
     });
 
-    // Add search filters with _like suffix for partial matching
     Object.entries(searchParams).forEach(([key, value]) => {
-        if (value && value.trim() !== '') {
-            // Handle special cases or defaults
-            params.append(`${key}`, value);
+        if (value !== undefined && value !== null && value !== "") {
+            params.append(key, value.toString());
         }
     });
 
