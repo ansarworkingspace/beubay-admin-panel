@@ -155,9 +155,7 @@ export const useStates = (page: number, limit: number, searchParams: Record<stri
 export const getAllCountries = async (): Promise<CountryDropdownItem[]> => {
     try {
         const response = await api.get(`/admin/countries/all`);
-        // Assuming response matches { status: 'success', data: { data: [...] } } or just { data: [...] }
-        // The user said: "call the admin/countries/all -> this api have no pagination"
-        // Let's assume standard response structure
+
         return response.data?.data || [];
     } catch (error) {
         console.error("Failed to fetch all countries", error);

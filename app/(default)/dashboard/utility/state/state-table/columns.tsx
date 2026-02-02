@@ -66,7 +66,7 @@ export function getColumns({
                 }
 
                 const viewUrl = `/dashboard/utility/state/view/${encodeURIComponent(stateId)}`;
-                const editUrl = `/dashboard/utility/state/form/${encodeURIComponent(stateId)}`;
+                const editUrl = `/dashboard/utility/state/edit/${encodeURIComponent(stateId)}`;
 
                 return (
                     <div className="flex items-center gap-2">

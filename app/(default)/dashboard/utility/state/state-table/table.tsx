@@ -254,7 +254,7 @@ export function StateTable() {
                     onSearchChange={handleSearchChange}
                     initialSearchValue={columnFilterValues["name"] || ""}
                     addTitle={"Create State"}
-                    url={`/dashboard/utility/state/form/add?page=${currentPage}&limit=${currentLimit}`}
+                    url={`/dashboard/utility/state/create?page=${currentPage}&limit=${currentLimit}`}
                     showGlobalSearch={false}
                 />
 
