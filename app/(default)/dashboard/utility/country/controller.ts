@@ -121,10 +121,10 @@ export const useCountries = (page: number, limit: number, searchParams: Record<s
     });
 };
 
-export function toggleCountryStatus(id: string): Promise<void> {
-
-    return api.patch(`/admin/countries/${id}`)
-        .then((res) => res.data);
+export function toggleCountryStatus(data: { id: string; currentStatus: boolean }): Promise<void> {
+    return api.patch(`/admin/countries/${data.id}/status`, {
+        is_active: !data.currentStatus
+    }).then((res) => res.data);
 }
 
 export function useToggleCountryStatus(options?: {

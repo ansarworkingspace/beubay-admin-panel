@@ -70,8 +70,8 @@ export function getColumns({
                 }
 
                 const queryParams = `?page=${currentPage}&limit=${currentLimit}`;
-                const viewUrl = `/dashboard/utility/country/view/${encodeURIComponent(countryId)}${queryParams}`;
-                const editUrl = `/dashboard/utility/country/form/${encodeURIComponent(countryId)}${queryParams}`;
+                const viewUrl = `/dashboard/utility/country/view/${encodeURIComponent(countryId)}`;
+                const editUrl = `/dashboard/utility/country/form/${encodeURIComponent(countryId)}`;
 
                 return (
                     <div className="flex items-center gap-2">
@@ -112,7 +112,7 @@ export function getColumns({
                                         variant="outline"
                                         size="icon"
                                         className={`w-15 h-7 ${row.original.is_active ? "text-green-500 hover:text-green-600" : "text-red-500 hover:text-red-600"}`}
-                                        onClick={() => toggleStatusMutation.mutate(countryId)}
+                                        onClick={() => toggleStatusMutation.mutate({ id: countryId, currentStatus: row.original.is_active })}
                                         disabled={toggleStatusMutation.isPending}
                                     >
                                         {row.original.is_active ? "Active" : "Inactive"}
