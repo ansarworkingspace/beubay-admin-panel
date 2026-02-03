@@ -59,9 +59,9 @@ export const sidebarData: SidebarData = {
         },
         {
             title: "Saloon Management",
-            url: "/dashboard/staff",
+            url: "/dashboard/salons",
             icon: Store,
-            moduleId: "staff", // Requires 'staff' permission
+            moduleId: "salons",
         },
         {
             title: "Service Management",
