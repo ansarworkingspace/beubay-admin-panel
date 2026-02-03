@@ -115,6 +115,8 @@ export default function EditSalonPage() {
         },
     });
 
+    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+    const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
     const [isFormReady, setIsFormReady] = React.useState(false);
     const [existingImages, setExistingImages] = useState<string[]>([]);
     const [deletedImages, setDeletedImages] = useState<string[]>([]);
@@ -168,30 +170,32 @@ export default function EditSalonPage() {
         return cities.filter((city: any) => city.state_id === selectedStateId);
     }, [cities, selectedStateId]);
 
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            const filesArray = Array.from(e.target.files);
+            const totalImages = existingImages.length + selectedFiles.length + filesArray.length;
 
-    const onSubmit = async (data: SalonFormData) => {
-        // We need to pass deleted_images to the mutation
-        // Since the interface might not have it, we might need to cast or update the interface.
-        // For now, we assume the controller handles it if we append it to formData.
-        // We'll modify the data object passed to mutation to include this.
-        const payload = {
-            ...data,
-            deleted_images: deletedImages
-        };
-        await updateSalonMutation.mutateAsync(payload as any);
+            const remainingSlots = 3 - (existingImages.length + selectedFiles.length);
+
+            if (remainingSlots > 0) {
+                const authorizedFiles = filesArray.slice(0, remainingSlots);
+
+                setSelectedFiles(prev => [...prev, ...authorizedFiles]);
+
+                const newPreviews = authorizedFiles.map(file => URL.createObjectURL(file));
+                setNewImagePreviews(prev => [...prev, ...newPreviews]);
+            }
+        }
+        e.target.value = "";
     };
 
-    const handleCancel = () => {
-        router.push("/dashboard/salons");
+    const handleRemoveNewFile = (index: number) => {
+        setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+        setNewImagePreviews(prev => {
+            if (prev[index]) URL.revokeObjectURL(prev[index]);
+            return prev.filter((_, i) => i !== index);
+        });
     };
-
-    // Prepare options for MultiSelect
-    const serviceOptions = React.useMemo(() => {
-        return (Array.isArray(serviceCategories) ? serviceCategories : []).map((cat: any) => ({
-            label: cat.name,
-            value: cat._id || cat.id
-        }));
-    }, [serviceCategories]);
 
     const handleRemoveImage = (imgUrl: string) => {
         setExistingImages(prev => prev.filter(url => url !== imgUrl));
@@ -209,6 +213,26 @@ export default function EditSalonPage() {
         }
     };
 
+    const onSubmit = async (data: SalonFormData) => {
+        const finalData = {
+            ...data,
+            images: selectedFiles as any,
+            deleted_images: deletedImages
+        };
+        await updateSalonMutation.mutateAsync(finalData);
+    };
+
+    const handleCancel = () => {
+        router.push("/dashboard/salons");
+    };
+
+    // Prepare options for MultiSelect
+    const serviceOptions = React.useMemo(() => {
+        return (Array.isArray(serviceCategories) ? serviceCategories : []).map((cat: any) => ({
+            label: cat.name,
+            value: cat._id || cat.id
+        }));
+    }, [serviceCategories]);
 
     if (isSalonLoading || isCountriesLoading || isStatesLoading || isCitiesLoading || isSalonCatsLoading || isServiceCatsLoading || !isFormReady) {
         return <Loading />;
@@ -364,20 +388,26 @@ export default function EditSalonPage() {
                         />
                     </FormField>
 
-                    <FormRowTwo>
+                    <FormRowTwo className="items-start">
                         <FormField label="Logo" error={(errors as any).logo?.message}>
                             <div className="space-y-4">
-                                {logoPreview && (
-                                    <div className="relative w-24 h-24 border rounded-md overflow-hidden group">
-                                        <img src={logoPreview} alt="Current Logo" className="w-full h-full object-cover" />
-                                    </div>
-                                )}
+                                <div className="min-h-[6rem] flex items-end">
+                                    {logoPreview ? (
+                                        <div className="relative w-24 h-24 border rounded-md overflow-hidden group">
+                                            <img src={logoPreview} alt="Current Logo" className="w-full h-full object-cover" />
+                                        </div>
+                                    ) : (
+                                        <div className="w-24 h-24 border rounded-md bg-muted flex items-center justify-center text-muted-foreground text-xs">
+                                            No Logo
+                                        </div>
+                                    )}
+                                </div>
                                 <Input
                                     type="file"
                                     accept="image/*"
                                     {...register("logo")}
                                     onChange={(e) => {
-                                        register("logo").onChange(e); // Propagate to react-hook-form
+                                        register("logo").onChange(e);
                                         handleLogoChange(e);
                                     }}
                                 />
@@ -385,33 +415,51 @@ export default function EditSalonPage() {
                         </FormField>
                         <FormField label="Salon Images (Max 3)" error={(errors as any).images?.message}>
                             <div className="space-y-4">
-                                {existingImages.length > 0 && (
-                                    <div className="flex flex-wrap gap-4">
-                                        {existingImages.map((img: string, idx: number) => (
-                                            <div key={idx} className="relative w-24 h-24 border rounded-md overflow-hidden group">
-                                                <img src={img} alt={`Salon image ${idx + 1}`} className="w-full h-full object-cover" />
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleRemoveImage(img)}
-                                                    className="absolute top-1 right-1 bg-white/80 hover:bg-white text-destructive rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                                                >
-                                                    <X className="h-4 w-4" />
-                                                </button>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
+                                <div className="min-h-[6rem] flex flex-wrap gap-4">
+                                    {existingImages.map((img: string, idx: number) => (
+                                        <div key={`existing-${idx}`} className="relative w-24 h-24 border rounded-md overflow-hidden group">
+                                            <img src={img} alt={`Salon image ${idx + 1}`} className="w-full h-full object-cover" />
+                                            <button
+                                                type="button"
+                                                onClick={() => handleRemoveImage(img)}
+                                                className="absolute top-1 right-1 bg-white/80 hover:bg-white text-destructive rounded-full p-1 opacity-100 shadow-sm transition-opacity"
+                                            >
+                                                <X className="h-4 w-4" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                    {newImagePreviews.map((preview, idx) => (
+                                        <div key={`new-${idx}`} className="relative w-24 h-24 border rounded-md overflow-hidden group">
+                                            <img src={preview} alt={`New upload ${idx + 1}`} className="w-full h-full object-cover opacity-80" />
+                                            <div className="absolute inset-0 bg-black/10" />
+                                            <button
+                                                type="button"
+                                                onClick={() => handleRemoveNewFile(idx)}
+                                                className="absolute top-1 right-1 bg-white/80 hover:bg-white text-destructive rounded-full p-1 opacity-100 shadow-sm transition-opacity"
+                                            >
+                                                <X className="h-4 w-4" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                    {existingImages.length === 0 && newImagePreviews.length === 0 && (
+                                        <div className="w-24 h-24 border rounded-md bg-muted flex items-center justify-center text-muted-foreground text-xs">
+                                            No Images
+                                        </div>
+                                    )}
+                                </div>
+
                                 <div className="flex items-center gap-2">
                                     <Input
                                         type="file"
                                         accept="image/*"
                                         multiple
-                                        disabled={existingImages.length >= 3}
-                                        {...register("images")}
+                                        disabled={existingImages.length + selectedFiles.length >= 3}
+                                        onChange={handleImageChange}
+                                        name="images_manual"
                                     />
                                 </div>
                                 <p className="text-xs text-muted-foreground">
-                                    {existingImages.length} OF 3 images used. Remove existing images to upload new ones.
+                                    {existingImages.length + selectedFiles.length} OF 3 images used.
                                 </p>
                             </div>
                         </FormField>
@@ -420,7 +468,7 @@ export default function EditSalonPage() {
 
                 {/* Business Hours */}
                 <FormSection title="Business Hours" description="Set the opening and closing times.">
-                    <div className="space-y-4"> {/* Added extra spacing wrapper */}
+                    <div className="space-y-4">
                         <Controller
                             name="business_hours"
                             control={control}
@@ -441,3 +489,4 @@ export default function EditSalonPage() {
         </FormContainer>
     );
 }
+

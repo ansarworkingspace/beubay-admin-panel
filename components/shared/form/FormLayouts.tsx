@@ -39,6 +39,7 @@ interface FormSectionProps {
 
 interface FormRowProps {
   children: ReactNode;
+  className?: string;
 }
 
 interface FormFieldProps {
@@ -138,8 +139,8 @@ export const FormRowOne: React.FC<FormRowProps> = ({ children }) => (
   <div className="space-y-2">{children}</div>
 );
 
-export const FormRowTwo: React.FC<FormRowProps> = ({ children }) => (
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">{children}</div>
+export const FormRowTwo: React.FC<FormRowProps> = ({ children, className }) => (
+  <div className={cn("grid grid-cols-1 md:grid-cols-2 gap-4", className)}>{children}</div>
 );
 
 export const FormRowThree: React.FC<FormRowProps> = ({ children }) => (
