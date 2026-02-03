@@ -91,6 +91,7 @@ export function MultiSelect({
                                 return (
                                     <CommandItem
                                         key={option.value}
+                                        value={option.label}
                                         onSelect={() => {
                                             onChange([...selected, option.value]);
                                             setInputValue("");

@@ -49,6 +49,10 @@ const createFormData = (data: SalonFormData, isEdit: boolean = false) => {
         }
     }
 
+    if ((data as any).deleted_images && (data as any).deleted_images.length > 0) {
+        formData.append("deleted_images", JSON.stringify((data as any).deleted_images));
+    }
+
     return formData;
 };
 

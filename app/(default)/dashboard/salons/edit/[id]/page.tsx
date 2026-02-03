@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useForm, Controller, useWatch } from "react-hook-form";
 import { useQuery } from "@tanstack/react-query";
+import { X, Upload } from "lucide-react";
 
 import {
     FormActions,
@@ -26,6 +27,7 @@ import { Label } from "@/components/ui/label";
 import { Loading } from "@/components/ui/loading";
 import { Error as ErrorComponent } from "@/components/ui/error";
 import { MultiSelect } from "@/components/ui/multi-select";
+import { Button } from "@/components/ui/button";
 
 import { SalonFormData, BusinessHours } from "../../model";
 import { BusinessHoursInput } from "../../components/business-hours-input";
@@ -62,7 +64,6 @@ export default function EditSalonPage() {
     const { data: states = [], isLoading: isStatesLoading } = useQuery({ queryKey: ['all-states'], queryFn: getAllStates });
     const { data: cities = [], isLoading: isCitiesLoading } = useQuery({ queryKey: ['all-cities'], queryFn: getAllCities });
 
-    // Use the /all endpoints for categories as requested
     const { data: salonCategories = [], isLoading: isSalonCatsLoading } = useQuery({
         queryKey: ['salon-categories-all'],
         queryFn: async () => {
@@ -115,6 +116,9 @@ export default function EditSalonPage() {
     });
 
     const [isFormReady, setIsFormReady] = React.useState(false);
+    const [existingImages, setExistingImages] = useState<string[]>([]);
+    const [deletedImages, setDeletedImages] = useState<string[]>([]);
+    const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
     // Populate form
     useEffect(() => {
@@ -137,6 +141,14 @@ export default function EditSalonPage() {
                 location: salon.location ? { lat: salon.location.coordinates[1], lng: salon.location.coordinates[0] } : { lat: 0, lng: 0 },
                 business_hours: salon.business_hours || defaultBusinessHours,
             });
+
+            if (salon.images && Array.isArray(salon.images)) {
+                setExistingImages(salon.images);
+            }
+            if (salon.logo_url) {
+                setLogoPreview(salon.logo_url);
+            }
+
             setIsFormReady(true);
         }
     }, [salon, reset]);
@@ -158,7 +170,15 @@ export default function EditSalonPage() {
 
 
     const onSubmit = async (data: SalonFormData) => {
-        await updateSalonMutation.mutateAsync(data);
+        // We need to pass deleted_images to the mutation
+        // Since the interface might not have it, we might need to cast or update the interface.
+        // For now, we assume the controller handles it if we append it to formData.
+        // We'll modify the data object passed to mutation to include this.
+        const payload = {
+            ...data,
+            deleted_images: deletedImages
+        };
+        await updateSalonMutation.mutateAsync(payload as any);
     };
 
     const handleCancel = () => {
@@ -172,6 +192,22 @@ export default function EditSalonPage() {
             value: cat._id || cat.id
         }));
     }, [serviceCategories]);
+
+    const handleRemoveImage = (imgUrl: string) => {
+        setExistingImages(prev => prev.filter(url => url !== imgUrl));
+        setDeletedImages(prev => [...prev, imgUrl]);
+    };
+
+    const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setLogoPreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
 
     if (isSalonLoading || isCountriesLoading || isStatesLoading || isCitiesLoading || isSalonCatsLoading || isServiceCatsLoading || !isFormReady) {
@@ -331,26 +367,52 @@ export default function EditSalonPage() {
                     <FormRowTwo>
                         <FormField label="Logo" error={(errors as any).logo?.message}>
                             <div className="space-y-4">
-                                {salon?.logo_url && (
+                                {logoPreview && (
                                     <div className="relative w-24 h-24 border rounded-md overflow-hidden group">
-                                        <img src={salon.logo_url} alt="Current Logo" className="w-full h-full object-cover" />
+                                        <img src={logoPreview} alt="Current Logo" className="w-full h-full object-cover" />
                                     </div>
                                 )}
-                                <Input type="file" accept="image/*" {...register("logo")} />
+                                <Input
+                                    type="file"
+                                    accept="image/*"
+                                    {...register("logo")}
+                                    onChange={(e) => {
+                                        register("logo").onChange(e); // Propagate to react-hook-form
+                                        handleLogoChange(e);
+                                    }}
+                                />
                             </div>
                         </FormField>
-                        <FormField label="Salon Images" error={(errors as any).images?.message}>
+                        <FormField label="Salon Images (Max 3)" error={(errors as any).images?.message}>
                             <div className="space-y-4">
-                                {salon?.images && salon.images.length > 0 && (
-                                    <div className="flex flex-wrap gap-2">
-                                        {salon.images.map((img: string, idx: number) => (
-                                            <div key={idx} className="relative w-20 h-20 border rounded-md overflow-hidden group">
+                                {existingImages.length > 0 && (
+                                    <div className="flex flex-wrap gap-4">
+                                        {existingImages.map((img: string, idx: number) => (
+                                            <div key={idx} className="relative w-24 h-24 border rounded-md overflow-hidden group">
                                                 <img src={img} alt={`Salon image ${idx + 1}`} className="w-full h-full object-cover" />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleRemoveImage(img)}
+                                                    className="absolute top-1 right-1 bg-white/80 hover:bg-white text-destructive rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                >
+                                                    <X className="h-4 w-4" />
+                                                </button>
                                             </div>
                                         ))}
                                     </div>
                                 )}
-                                <Input type="file" accept="image/*" multiple {...register("images")} />
+                                <div className="flex items-center gap-2">
+                                    <Input
+                                        type="file"
+                                        accept="image/*"
+                                        multiple
+                                        disabled={existingImages.length >= 3}
+                                        {...register("images")}
+                                    />
+                                </div>
+                                <p className="text-xs text-muted-foreground">
+                                    {existingImages.length} OF 3 images used. Remove existing images to upload new ones.
+                                </p>
                             </div>
                         </FormField>
                     </FormRowTwo>
@@ -358,13 +420,15 @@ export default function EditSalonPage() {
 
                 {/* Business Hours */}
                 <FormSection title="Business Hours" description="Set the opening and closing times.">
-                    <Controller
-                        name="business_hours"
-                        control={control}
-                        render={({ field }) => (
-                            <BusinessHoursInput value={field.value} onChange={field.onChange} />
-                        )}
-                    />
+                    <div className="space-y-4"> {/* Added extra spacing wrapper */}
+                        <Controller
+                            name="business_hours"
+                            control={control}
+                            render={({ field }) => (
+                                <BusinessHoursInput value={field.value} onChange={field.onChange} />
+                            )}
+                        />
+                    </div>
                 </FormSection>
 
                 <FormActions
