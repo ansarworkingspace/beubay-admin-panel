@@ -300,7 +300,7 @@ export default function EditSalonPage() {
 
                 {/* Location Information */}
                 <FormSection title="Location" description="Address and geographical details.">
-                    <FormRowTwo>
+                    <FormRowTwo >
                         <FormField label="Country" required error={errors.country_id?.message}>
                             <Controller
                                 name="country_id"
@@ -312,7 +312,7 @@ export default function EditSalonPage() {
                                         setValue("state_id", "");
                                         setValue("city_id", "");
                                     }} value={field.value || ""}>
-                                        <SelectTrigger><SelectValue placeholder="Select Country" /></SelectTrigger>
+                                        <SelectTrigger className="w-full"><SelectValue placeholder="Select Country" /></SelectTrigger>
                                         <SelectContent>
                                             {countries.map((c: any) => <SelectItem key={c._id} value={c._id}>{c.name}</SelectItem>)}
                                         </SelectContent>
@@ -330,7 +330,7 @@ export default function EditSalonPage() {
                                         field.onChange(val);
                                         setValue("city_id", "");
                                     }} value={field.value || ""} disabled={!selectedCountryId}>
-                                        <SelectTrigger><SelectValue placeholder="Select State" /></SelectTrigger>
+                                        <SelectTrigger className="w-full"><SelectValue placeholder="Select State" /></SelectTrigger>
                                         <SelectContent>
                                             {filteredStates.map((s: any) => <SelectItem key={s._id} value={s._id}>{s.name}</SelectItem>)}
                                         </SelectContent>
@@ -347,7 +347,7 @@ export default function EditSalonPage() {
                                 rules={{ required: "City is required" }}
                                 render={({ field }) => (
                                     <Select onValueChange={field.onChange} value={field.value || ""} disabled={!selectedStateId}>
-                                        <SelectTrigger><SelectValue placeholder="Select City" /></SelectTrigger>
+                                        <SelectTrigger className="w-full"><SelectValue placeholder="Select City" /></SelectTrigger>
                                         <SelectContent>
                                             {filteredCities.map((c: any) => <SelectItem key={c._id} value={c._id}>{c.name}</SelectItem>)}
                                         </SelectContent>
