@@ -27,9 +27,11 @@ const createFormData = (data: SalonFormData, isEdit: boolean = false) => {
     }
 
     if (data.location) {
+        const lat = Number(data.location.lat) || 0;
+        const lng = Number(data.location.lng) || 0;
         const loc = {
             type: "Point",
-            coordinates: [data.location.lng, data.location.lat] // [longitude, latitude]
+            coordinates: [lng, lat] // [longitude, latitude]
         };
         formData.append("location", JSON.stringify(loc));
     }

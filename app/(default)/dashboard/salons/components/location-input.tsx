@@ -20,7 +20,7 @@ export function LocationInput({ value, onChange }: LocationInputProps) {
                         type="number"
                         step="any"
                         value={value?.lat}
-                        onChange={(e) => onChange({ ...value, lat: parseFloat(e.target.value) })}
+                        onChange={(e) => onChange({ ...value, lat: parseFloat(e.target.value) || 0 })}
                         placeholder="e.g. 9.931"
                     />
                 </div>
@@ -30,7 +30,7 @@ export function LocationInput({ value, onChange }: LocationInputProps) {
                         type="number"
                         step="any"
                         value={value?.lng}
-                        onChange={(e) => onChange({ ...value, lng: parseFloat(e.target.value) })}
+                        onChange={(e) => onChange({ ...value, lng: parseFloat(e.target.value) || 0 })}
                         placeholder="e.g. 76.267"
                     />
                 </div>
