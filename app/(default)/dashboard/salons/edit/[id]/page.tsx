@@ -379,6 +379,7 @@ export default function EditSalonPage() {
                             control={control}
                             render={({ field }) => (
                                 <MultiSelect
+                                    key={field.value ? field.value.toString() : "multi-select"}
                                     options={serviceOptions}
                                     selected={field.value || []}
                                     onChange={field.onChange}
