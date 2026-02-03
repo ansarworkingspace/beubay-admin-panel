@@ -32,8 +32,8 @@ export function BusinessHoursInput({ value, onChange }: BusinessHoursInputProps)
                 {DAYS.map((day) => {
                     const dayData = value?.[day] || { is_open: false, opening_time: '', closing_time: '' };
                     return (
-                        <div key={day} className="flex items-center gap-4 border p-3 rounded-md">
-                            <div className="w-24 capitalize font-medium flex items-center gap-2">
+                        <div key={day} className="flex items-center gap-10 border p-3 rounded-md">
+                            <div className="w-32 capitalize font-medium flex items-center gap-2">
                                 <Checkbox
                                     checked={dayData.is_open}
                                     onCheckedChange={(checked) => handleDayChange(day, 'is_open', !!checked)}
