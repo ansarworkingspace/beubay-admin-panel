@@ -198,7 +198,7 @@ export default function CreateSalonPage() {
                                         setValue("state_id", "");
                                         setValue("city_id", "");
                                     }} value={field.value} disabled={isCountriesLoading}>
-                                        <SelectTrigger><SelectValue placeholder="Select Country" /></SelectTrigger>
+                                        <SelectTrigger className="w-full"><SelectValue placeholder="Select Country" /></SelectTrigger>
                                         <SelectContent>
                                             {countries.map((c: any) => <SelectItem key={c._id} value={c._id}>{c.name}</SelectItem>)}
                                         </SelectContent>
@@ -216,7 +216,7 @@ export default function CreateSalonPage() {
                                         field.onChange(val);
                                         setValue("city_id", "");
                                     }} value={field.value} disabled={!selectedCountryId || isStatesLoading}>
-                                        <SelectTrigger><SelectValue placeholder="Select State" /></SelectTrigger>
+                                        <SelectTrigger className="w-full"><SelectValue placeholder="Select State" /></SelectTrigger>
                                         <SelectContent>
                                             {filteredStates.map((s: any) => <SelectItem key={s._id} value={s._id}>{s.name}</SelectItem>)}
                                         </SelectContent>
@@ -233,7 +233,7 @@ export default function CreateSalonPage() {
                                 rules={{ required: "City is required" }}
                                 render={({ field }) => (
                                     <Select onValueChange={field.onChange} value={field.value} disabled={!selectedStateId || isCitiesLoading}>
-                                        <SelectTrigger><SelectValue placeholder="Select City" /></SelectTrigger>
+                                        <SelectTrigger className="w-full"><SelectValue placeholder="Select City" /></SelectTrigger>
                                         <SelectContent>
                                             {filteredCities.map((c: any) => <SelectItem key={c._id} value={c._id}>{c.name}</SelectItem>)}
                                         </SelectContent>
