@@ -22,12 +22,12 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Loading } from "@/components/ui/loading";
 import { Error as ErrorComponent } from "@/components/ui/error";
+import { MultiSelect } from "@/components/ui/multi-select";
 
-import { SalonFormData, BusinessHours, BusinessHour } from "../../model";
+import { SalonFormData, BusinessHours } from "../../model";
 import { BusinessHoursInput } from "../../components/business-hours-input";
 import { LocationInput } from "../../components/location-input";
 import { useUpdateSalonMutation, useSalonDetails } from "../../controller";
@@ -38,7 +38,7 @@ import { getSalonCategories } from "../../../utility/salon-category/controller";
 import { getServiceCategories } from "../../../utility/service-category/controller";
 import api from "@/lib/api_client";
 
-// Define getAllCities locally as it might not be exported
+// Define getAllCities locally as it might not be exported from controller
 const getAllCities = async () => {
     try {
         const response = await api.get(`/admin/cities/all`);
@@ -61,8 +61,23 @@ export default function EditSalonPage() {
     const { data: countries = [], isLoading: isCountriesLoading } = useQuery({ queryKey: ['all-countries'], queryFn: getAllCountries });
     const { data: states = [], isLoading: isStatesLoading } = useQuery({ queryKey: ['all-states'], queryFn: getAllStates });
     const { data: cities = [], isLoading: isCitiesLoading } = useQuery({ queryKey: ['all-cities'], queryFn: getAllCities });
-    const { data: salonCategories = [] } = useQuery({ queryKey: ['salon-categories-all'], queryFn: () => getSalonCategories(1, 100) });
-    const { data: serviceCategories = [] } = useQuery({ queryKey: ['service-categories-all'], queryFn: () => getServiceCategories(1, 100) });
+
+    // Use the /all endpoints for categories as requested
+    const { data: salonCategories = [], isLoading: isSalonCatsLoading } = useQuery({
+        queryKey: ['salon-categories-all'],
+        queryFn: async () => {
+            const res = await api.get('/admin/salon-categories/all');
+            return res.data?.data || [];
+        }
+    });
+
+    const { data: serviceCategories = [], isLoading: isServiceCatsLoading } = useQuery({
+        queryKey: ['service-categories-all'],
+        queryFn: async () => {
+            const res = await api.get('/admin/service-categories/all');
+            return res.data?.data || [];
+        }
+    });
 
     const defaultBusinessHours: BusinessHours = {
         monday: { is_open: true, opening_time: "09:00", closing_time: "21:00" },
@@ -99,11 +114,12 @@ export default function EditSalonPage() {
         },
     });
 
+    const [isFormReady, setIsFormReady] = React.useState(false);
+
     // Populate form
     useEffect(() => {
         if (salon) {
-            // Helper to get ID from string or populated object
-            const getId = (item: any) => typeof item === 'object' ? item._id : item;
+            const getId = (item: any) => (item && typeof item === 'object' && item._id) ? item._id : item;
 
             reset({
                 salon_name: salon.salon_name,
@@ -112,18 +128,18 @@ export default function EditSalonPage() {
                 phone: salon.phone,
                 salon_category_id: getId(salon.salon_category_id),
                 country_id: getId(salon.country_id),
-                // We set state and city later or right here. If we trust the ID is valid for the country.
-                // However, state list depends on country select.
-                // But since we fetch ALL states/cities for reference data, it should map correctly if ID matches.
                 state_id: getId(salon.state_id),
                 city_id: getId(salon.city_id),
                 address: salon.address,
-                service_category_ids: salon.service_category_ids?.map((s: any) => getId(s)) || [],
+                service_category_ids: Array.isArray(salon.service_category_ids)
+                    ? salon.service_category_ids.map((s: any) => getId(s))
+                    : [],
                 location: salon.location ? { lat: salon.location.coordinates[1], lng: salon.location.coordinates[0] } : { lat: 0, lng: 0 },
                 business_hours: salon.business_hours || defaultBusinessHours,
             });
+            setIsFormReady(true);
         }
-    }, [salon]);
+    }, [salon, reset]);
 
 
     // Dependent Dropdowns
@@ -149,7 +165,19 @@ export default function EditSalonPage() {
         router.push("/dashboard/salons");
     };
 
-    if (isSalonLoading) return <Loading />;
+    // Prepare options for MultiSelect
+    const serviceOptions = React.useMemo(() => {
+        return (Array.isArray(serviceCategories) ? serviceCategories : []).map((cat: any) => ({
+            label: cat.name,
+            value: cat._id || cat.id
+        }));
+    }, [serviceCategories]);
+
+
+    if (isSalonLoading || isCountriesLoading || isStatesLoading || isCitiesLoading || isSalonCatsLoading || isServiceCatsLoading || !isFormReady) {
+        return <Loading />;
+    }
+
     if (salonError) return <ErrorComponent message="Failed to load salon details" />;
 
 
@@ -193,12 +221,12 @@ export default function EditSalonPage() {
                                 control={control}
                                 rules={{ required: "Category is required" }}
                                 render={({ field }) => (
-                                    <Select onValueChange={field.onChange} value={field.value}>
+                                    <Select onValueChange={field.onChange} value={field.value || ""}>
                                         <SelectTrigger>
                                             <SelectValue placeholder="Select Category" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {(salonCategories as any[] || []).map((cat) => (
+                                            {(Array.isArray(salonCategories) ? salonCategories : []).map((cat: any) => (
                                                 <SelectItem key={cat._id || cat.id} value={cat._id || cat.id}>{cat.name}</SelectItem>
                                             ))}
                                         </SelectContent>
@@ -223,7 +251,7 @@ export default function EditSalonPage() {
                                         field.onChange(val);
                                         setValue("state_id", "");
                                         setValue("city_id", "");
-                                    }} value={field.value} disabled={isCountriesLoading}>
+                                    }} value={field.value || ""}>
                                         <SelectTrigger><SelectValue placeholder="Select Country" /></SelectTrigger>
                                         <SelectContent>
                                             {countries.map((c: any) => <SelectItem key={c._id} value={c._id}>{c.name}</SelectItem>)}
@@ -241,7 +269,7 @@ export default function EditSalonPage() {
                                     <Select onValueChange={(val) => {
                                         field.onChange(val);
                                         setValue("city_id", "");
-                                    }} value={field.value} disabled={!selectedCountryId || isStatesLoading}>
+                                    }} value={field.value || ""} disabled={!selectedCountryId}>
                                         <SelectTrigger><SelectValue placeholder="Select State" /></SelectTrigger>
                                         <SelectContent>
                                             {filteredStates.map((s: any) => <SelectItem key={s._id} value={s._id}>{s.name}</SelectItem>)}
@@ -258,7 +286,7 @@ export default function EditSalonPage() {
                                 control={control}
                                 rules={{ required: "City is required" }}
                                 render={({ field }) => (
-                                    <Select onValueChange={field.onChange} value={field.value} disabled={!selectedStateId || isCitiesLoading}>
+                                    <Select onValueChange={field.onChange} value={field.value || ""} disabled={!selectedStateId}>
                                         <SelectTrigger><SelectValue placeholder="Select City" /></SelectTrigger>
                                         <SelectContent>
                                             {filteredCities.map((c: any) => <SelectItem key={c._id} value={c._id}>{c.name}</SelectItem>)}
@@ -290,42 +318,40 @@ export default function EditSalonPage() {
                             name="service_category_ids"
                             control={control}
                             render={({ field }) => (
-                                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 border p-4 rounded-md h-48 overflow-y-auto">
-                                    {(serviceCategories as any[] || []).map((service) => (
-                                        <div key={service._id} className="flex items-center space-x-2">
-                                            <Checkbox
-                                                id={`service-${service._id}`}
-                                                checked={(field.value || []).includes(service._id)}
-                                                onCheckedChange={(checked) => {
-                                                    const current = field.value || [];
-                                                    if (checked) field.onChange([...current, service._id]);
-                                                    else field.onChange(current.filter((id: string) => id !== service._id));
-                                                }}
-                                            />
-                                            <Label htmlFor={`service-${service._id}`} className="cursor-pointer">{service.name}</Label>
-                                        </div>
-                                    ))}
-                                </div>
+                                <MultiSelect
+                                    options={serviceOptions}
+                                    selected={field.value || []}
+                                    onChange={field.onChange}
+                                    placeholder="Select services..."
+                                />
                             )}
                         />
                     </FormField>
 
                     <FormRowTwo>
                         <FormField label="Logo" error={(errors as any).logo?.message}>
-                            <Input type="file" accept="image/*" {...register("logo")} />
-                            {salon?.logo_url && (
-                                <div className="mt-2 text-xs text-muted-foreground">
-                                    Current: <a href={salon.logo_url} target="_blank" className="underline">View Logo</a>
-                                </div>
-                            )}
+                            <div className="space-y-4">
+                                {salon?.logo_url && (
+                                    <div className="relative w-24 h-24 border rounded-md overflow-hidden group">
+                                        <img src={salon.logo_url} alt="Current Logo" className="w-full h-full object-cover" />
+                                    </div>
+                                )}
+                                <Input type="file" accept="image/*" {...register("logo")} />
+                            </div>
                         </FormField>
                         <FormField label="Salon Images" error={(errors as any).images?.message}>
-                            <Input type="file" accept="image/*" multiple {...register("images")} />
-                            {salon?.images && salon.images.length > 0 && (
-                                <div className="mt-2 text-xs text-muted-foreground">
-                                    {salon.images.length} images uploaded.
-                                </div>
-                            )}
+                            <div className="space-y-4">
+                                {salon?.images && salon.images.length > 0 && (
+                                    <div className="flex flex-wrap gap-2">
+                                        {salon.images.map((img: string, idx: number) => (
+                                            <div key={idx} className="relative w-20 h-20 border rounded-md overflow-hidden group">
+                                                <img src={img} alt={`Salon image ${idx + 1}`} className="w-full h-full object-cover" />
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                                <Input type="file" accept="image/*" multiple {...register("images")} />
+                            </div>
                         </FormField>
                     </FormRowTwo>
                 </FormSection>

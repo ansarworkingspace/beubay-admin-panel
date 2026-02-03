@@ -89,8 +89,20 @@ export default function CreateSalonPage() {
     const { data: countries = [], isLoading: isCountriesLoading } = useQuery({ queryKey: ['all-countries'], queryFn: getAllCountries });
     const { data: states = [], isLoading: isStatesLoading } = useQuery({ queryKey: ['all-states'], queryFn: getAllStates });
     const { data: cities = [], isLoading: isCitiesLoading } = useQuery({ queryKey: ['all-cities'], queryFn: getAllCities });
-    const { data: salonCategories = [] } = useQuery({ queryKey: ['salon-categories-all'], queryFn: () => getSalonCategories(1, 100) });
-    const { data: serviceCategories = [] } = useQuery({ queryKey: ['service-categories-all'], queryFn: () => getServiceCategories(1, 100) });
+    const { data: salonCategories = [] } = useQuery({
+        queryKey: ['salon-categories-all'],
+        queryFn: async () => {
+            const res = await api.get('/admin/salon-categories/all');
+            return res.data?.data || [];
+        }
+    });
+    const { data: serviceCategories = [] } = useQuery({
+        queryKey: ['service-categories-all'],
+        queryFn: async () => {
+            const res = await api.get('/admin/service-categories/all');
+            return res.data?.data || [];
+        }
+    });
 
     // Dependent Dropdowns
     const selectedCountryId = useWatch({ control, name: "country_id" });
@@ -160,7 +172,7 @@ export default function CreateSalonPage() {
                                             <SelectValue placeholder="Select Category" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {(salonCategories as any[] || []).map((cat) => (
+                                            {(Array.isArray(salonCategories) ? salonCategories : []).map((cat: any) => (
                                                 <SelectItem key={cat._id || cat.id} value={cat._id || cat.id}>{cat.name}</SelectItem>
                                             ))}
                                         </SelectContent>
@@ -253,7 +265,7 @@ export default function CreateSalonPage() {
                             control={control}
                             render={({ field }) => (
                                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 border p-4 rounded-md h-48 overflow-y-auto">
-                                    {(serviceCategories as any[] || []).map((service) => (
+                                    {(Array.isArray(serviceCategories) ? serviceCategories : []).map((service: any) => (
                                         <div key={service._id} className="flex items-center space-x-2">
                                             <Checkbox
                                                 id={`service-${service._id}`}
