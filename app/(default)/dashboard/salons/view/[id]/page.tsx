@@ -126,19 +126,23 @@ export default function ViewSalonPage() {
                 </FormSection>
 
                 <FormSection title="Business Hours" description="Weekly opening hours.">
-                    <div className="grid gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {salon.business_hours && Object.entries(salon.business_hours).map(([day, hours]: [string, any]) => (
-                            <div key={day} className="flex items-center justify-between p-2 border rounded-md bg-muted/50">
-                                <span className="capitalize font-medium w-32">{day}</span>
-                                <div className="flex-1 text-right">
-                                    {hours.is_open ? (
-                                        <span className="text-sm">
-                                            {formatTime(hours.opening_time)} - {formatTime(hours.closing_time)}
-                                        </span>
-                                    ) : (
-                                        <span className="text-sm text-muted-foreground">Closed</span>
-                                    )}
-                                </div>
+                            <div key={day} className="flex items-center justify-between p-3 border rounded-md bg-card/50 hover:bg-accent/5 transition-colors">
+                                <span className="capitalize font-medium text-sm">{day}</span>
+                                {hours.is_open ? (
+                                    <div className="flex items-center gap-1.5">
+                                        <Badge variant="outline" className="font-mono text-xs bg-background">
+                                            {formatTime(hours.opening_time)}
+                                        </Badge>
+                                        <span className="text-muted-foreground text-xs">-</span>
+                                        <Badge variant="outline" className="font-mono text-xs bg-background">
+                                            {formatTime(hours.closing_time)}
+                                        </Badge>
+                                    </div>
+                                ) : (
+                                    <Badge variant="secondary" className="text-xs">Closed</Badge>
+                                )}
                             </div>
                         ))}
                     </div>
