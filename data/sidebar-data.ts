@@ -65,9 +65,9 @@ export const sidebarData: SidebarData = {
         },
         {
             title: "Service Management",
-            url: "/dashboard/settings",
+            url: "/dashboard/services",
             icon: Scissors,
-            moduleId: "settings",
+            moduleId: "services",
         },
         {
             title: "Stylist Management",
