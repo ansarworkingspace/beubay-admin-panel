@@ -41,7 +41,7 @@ export default function DefaultLayout({
                         <UserNav />
                     </div>
                 </header>
-                <div className="p-4">
+                <div className="min-h-[calc(100vh-4rem)] bg-muted p-4">
                     {children}
                 </div>
             </main>
