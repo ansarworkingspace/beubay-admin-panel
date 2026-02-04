@@ -53,9 +53,9 @@ export const sidebarData: SidebarData = {
     navMain: [
         {
             title: "Overview",
-            url: "/dashboard",
+            url: "/dashboard/overview",
             icon: LayoutDashboard,
-            moduleId: "dashboard",
+            moduleId: "overview",
         },
         {
             title: "Saloon Management",
@@ -71,27 +71,27 @@ export const sidebarData: SidebarData = {
         },
         {
             title: "Stylist Management",
-            url: "/dashboard/settings",
+            url: "/dashboard/stylist",
             icon: Users,
             moduleId: "settings",
         },
         {
             title: "Booking Management",
-            url: "/dashboard/settings",
+            url: "/dashboard/booking",
             icon: CalendarDays,
-            moduleId: "settings",
+            moduleId: "bookings",
         },
         {
             title: "Ratings & Reviews",
-            url: "/dashboard/settings",
+            url: "/dashboard/review",
             icon: Star,
-            moduleId: "settings",
+            moduleId: "reviews",
         },
         {
             title: "Reports",
-            url: "/dashboard/settings",
+            url: "/dashboard/reports",
             icon: ChartPie,
-            moduleId: "settings",
+            moduleId: "reports",
         },
         {
             title: "Utility",

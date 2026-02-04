@@ -80,7 +80,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         <SidebarMenu>
                             {navItems.map((item) => {
                                 // Check if main item is active (only if it has no sub-items)
-                                const isMainActive = item.items?.length === 0 && (item.url === "/" ? pathname === "/" : pathname?.startsWith(item.url));
+                                // Check if main item is active (only if it has no sub-items)
+                                const hasSubItems = item.items && item.items.length > 0;
+                                const isMainActive = !hasSubItems && (item.url === "/" ? pathname === "/" : pathname?.startsWith(item.url));
 
                                 return (
                                     <Collapsible
@@ -97,7 +99,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                                     className="data-[active=true]:bg-black data-[active=true]:text-white dark:data-[active=true]:bg-[#7C3AED] dark:data-[active=true]:text-white hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                                                 >
                                                     {item.icon && <item.icon />}
-                                                    {item.items && item.items.length > 0 ? (
+                                                    {hasSubItems ? (
                                                         <>
                                                             <span>{item.title}</span>
                                                             <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
@@ -109,16 +111,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                                     )}
                                                 </SidebarMenuButton>
                                             </CollapsibleTrigger>
-                                            {item.items && item.items.length > 0 && (
+                                            {hasSubItems && (
                                                 <CollapsibleContent>
                                                     <SidebarMenuSub>
-                                                        {item.items.map((subItem) => {
-                                                            const isSubActive = pathname === subItem.url;
+                                                        {item.items!.map((subItem) => {
+                                                            const isSubActive = pathname?.startsWith(subItem.url);
                                                             return (
                                                                 <SidebarMenuSubItem key={subItem.title}>
                                                                     <SidebarMenuSubButton
                                                                         asChild
-                                                                        isActive={isSubActive}
+                                                                        isActive={Boolean(isSubActive)}
                                                                         className="data-[active=true]:bg-black data-[active=true]:text-white dark:data-[active=true]:bg-[#7C3AED] dark:data-[active=true]:text-white"
                                                                     >
                                                                         <Link href={subItem.url}>
