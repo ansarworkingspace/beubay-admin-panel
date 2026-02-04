@@ -250,7 +250,7 @@ export function ServiceTable() {
                         <TableBody>
                             {table.getRowModel().rows?.length ? (
                                 table.getRowModel().rows.map((row) => (
-                                    <TableRow key={row.id} data-state={row.getIsSelected() && "selected"} className="hover:bg-accent transition-colors">
+                                    <TableRow key={row.id} data-state={row.getIsSelected() && "selected"} className="transition-colors">
                                         {row.getVisibleCells().map(cell => (
                                             <TableCell key={cell.id} className="py-3 whitespace-nowrap">
                                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
