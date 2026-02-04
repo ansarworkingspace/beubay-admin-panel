@@ -1,15 +1,25 @@
-"use client";
-
-import React from 'react';
 import { StylistTable } from './table/table';
-import { FormBreadcrumb } from '@/components/shared/form/FormLayouts';
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 
 export default function StylistPage() {
     return (
-        <div className="space-y-6">
-            <FormBreadcrumb items={['Dashboard', 'Stylists']} />
-            <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-bold tracking-tight">Stylist Management</h1>
+        <div className="space-y-4">
+            <Breadcrumb>
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbPage>Stylists</BreadcrumbPage>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
+            <div className="flex items-center justify-between space-y-2">
+                <h2 className="text-3xl font-bold tracking-tight">Stylists</h2>
+                <div className="flex items-center space-x-2">
+                    {/* Additional dashboard actions if needed */}
+                </div>
             </div>
             <StylistTable />
         </div>
