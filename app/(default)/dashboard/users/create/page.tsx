@@ -144,14 +144,14 @@ export default function CreateUserPage() {
                     </FormRowTwo>
 
                     {/* Optional Password if creating manually */}
-                    <FormField label="Password" error={errors.password?.message}>
+                    {/* <FormField label="Password" error={errors.password?.message}>
                         <Input
                             type="password"
                             {...register("password", { minLength: { value: 6, message: "Password must be at least 6 characters" } })}
                             placeholder="******"
                         />
                         <p className="text-xs text-muted-foreground mt-1">Optional. Defaults will apply if left blank.</p>
-                    </FormField>
+                    </FormField> */}
                 </FormSection>
 
                 <FormSection title="Profile Image" description="User's profile picture.">
