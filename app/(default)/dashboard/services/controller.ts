@@ -100,6 +100,31 @@ export const useUpdateServiceMutation = (id: string) => {
     });
 };
 
+export function useToggleServiceStatus(options?: {
+    onSuccess?: () => void;
+    onError?: (error: any) => void;
+}) {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (data: { id: string; currentStatus: boolean }) => {
+            await api.patch(`/admin/services/${data.id}/status`, {
+                is_active: !data.currentStatus
+            });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["services"] });
+            toast.success("Status updated successfully!");
+            options?.onSuccess?.();
+        },
+        onError: (error: any) => {
+            console.error("Toggle status error:", error);
+            const errorMessage = error?.response?.data?.message || "Failed to update status";
+            options?.onError?.(error);
+        },
+    });
+}
+
 export const getServiceDetails = async (id: string) => {
     try {
         const { data } = await api.get(`/admin/services/${id}`);

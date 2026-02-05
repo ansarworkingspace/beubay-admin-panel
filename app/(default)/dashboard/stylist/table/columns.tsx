@@ -14,6 +14,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Eye, SquarePen } from "lucide-react";
 import { Stylist } from "../model";
+import { useToggleStylistStatus } from "../controller";
 
 interface GetColumnsProps {
     currentPage: string;
@@ -54,6 +55,7 @@ export function getColumns({
             enableColumnFilter: false,
             cell: ({ row }) => {
                 const id = row.original._id;
+                const toggleStatusMutation = useToggleStylistStatus();
 
                 if (!id) return null;
 
@@ -85,6 +87,25 @@ export function getColumns({
                                     </Link>
                                 </TooltipTrigger>
                                 <TooltipContent side="top"><p>Edit Stylist</p></TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        size="icon"
+                                        className={`w-15 h-7 ${row.original.is_active ? "text-green-500 hover:text-green-600" : "text-red-500 hover:text-red-600"}`}
+                                        onClick={() => toggleStatusMutation.mutate({ id, currentStatus: row.original.is_active })}
+                                        disabled={toggleStatusMutation.isPending}
+                                    >
+                                        {row.original.is_active ? "Active" : "Inactive"}
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="top">
+                                    <p>{row.original.is_active ? "Deactivate" : "Activate"}</p>
+                                </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
                     </div>

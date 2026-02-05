@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "@/components/shared/table/data-table-column-header";
@@ -13,66 +12,14 @@ import {
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Eye, SquarePen, Power, UserRound } from "lucide-react";
+import { Eye, SquarePen, UserRound } from "lucide-react";
 import { Customer } from "../model";
 import { useUpdateCustomerStatusMutation } from "../controller";
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
 
 interface GetColumnsProps {
     currentPage: string;
     currentLimit: string;
 }
-
-const StatusToggle = ({ customer }: { customer: Customer }) => {
-    const updateStatusMutation = useUpdateCustomerStatusMutation();
-    const [open, setOpen] = React.useState(false);
-
-    const handleStatusUpdate = () => {
-        updateStatusMutation.mutate(
-            { id: customer._id, status: !customer.is_active },
-            {
-                onSuccess: () => {
-                    setOpen(false);
-                }
-            }
-        );
-    };
-
-    return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-                <Button variant="ghost" size="icon" className={`w-7 h-7 ${customer.is_active ? 'text-green-600' : 'text-red-600'}`}>
-                    <Power className="w-4 h-4" />
-                </Button>
-            </DialogTrigger>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Are you sure?</DialogTitle>
-                    <DialogDescription>
-                        This will {customer.is_active ? 'deactivate' : 'activate'} the user account for {customer.name || customer.phone}.
-                    </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                    <DialogClose asChild>
-                        <Button variant="outline">Cancel</Button>
-                    </DialogClose>
-                    <Button onClick={handleStatusUpdate} disabled={updateStatusMutation.isPending}>
-                        {updateStatusMutation.isPending ? "Updating..." : "Confirm"}
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
-    );
-};
 
 export function getColumns({
     currentPage,
@@ -108,6 +55,7 @@ export function getColumns({
             enableColumnFilter: false,
             cell: ({ row }) => {
                 const id = row.original._id;
+                const updateStatusMutation = useUpdateCustomerStatusMutation();
 
                 if (!id) return null;
 
@@ -145,11 +93,19 @@ export function getColumns({
                         <TooltipProvider>
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <div>
-                                        <StatusToggle customer={row.original} />
-                                    </div>
+                                    <Button
+                                        variant="outline"
+                                        size="icon"
+                                        className={`w-15 h-7 ${row.original.is_active ? "text-green-500 hover:text-green-600" : "text-red-500 hover:text-red-600"}`}
+                                        onClick={() => updateStatusMutation.mutate({ id, status: !row.original.is_active })}
+                                        disabled={updateStatusMutation.isPending}
+                                    >
+                                        {row.original.is_active ? "Active" : "Inactive"}
+                                    </Button>
                                 </TooltipTrigger>
-                                <TooltipContent side="top"><p>{row.original.is_active ? 'Deactivate' : 'Activate'}</p></TooltipContent>
+                                <TooltipContent side="top">
+                                    <p>{row.original.is_active ? "Deactivate" : "Activate"}</p>
+                                </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
                     </div>
@@ -238,7 +194,7 @@ export function getColumns({
             ),
             cell: ({ row }) => (
                 <Badge
-                    variant={row.original.is_active ? "default" : "secondary"}
+                    variant={row.original.is_active ? "default" : "destructive"}
                     className={row.original.is_active ? "bg-green-100 text-green-800 hover:bg-green-200" : "bg-red-100 text-red-800 hover:bg-red-200"}
                 >
                     {row.original.is_active ? "Active" : "Inactive"}

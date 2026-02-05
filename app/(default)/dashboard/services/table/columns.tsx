@@ -14,6 +14,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Eye, SquarePen } from "lucide-react";
 import { Service } from "../model";
+import { useToggleServiceStatus } from "../controller";
 
 interface GetColumnsProps {
     currentPage: string;
@@ -54,10 +55,10 @@ export function getColumns({
             enableColumnFilter: false,
             cell: ({ row }) => {
                 const id = row.original._id;
+                const toggleStatusMutation = useToggleServiceStatus();
 
                 if (!id) return null;
 
-                // Assuming similar edit/view routes structure
                 const viewUrl = `/dashboard/services/view/${encodeURIComponent(id)}`;
                 const editUrl = `/dashboard/services/edit/${encodeURIComponent(id)}`;
 
@@ -86,6 +87,25 @@ export function getColumns({
                                     </Link>
                                 </TooltipTrigger>
                                 <TooltipContent side="top"><p>Edit Service</p></TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        size="icon"
+                                        className={`w-15 h-7 ${row.original.is_active ? "text-green-500 hover:text-green-600" : "text-red-500 hover:text-red-600"}`}
+                                        onClick={() => toggleStatusMutation.mutate({ id, currentStatus: row.original.is_active })}
+                                        disabled={toggleStatusMutation.isPending}
+                                    >
+                                        {row.original.is_active ? "Active" : "Inactive"}
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="top">
+                                    <p>{row.original.is_active ? "Deactivate" : "Activate"}</p>
+                                </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
                     </div>
@@ -124,7 +144,7 @@ export function getColumns({
         },
         {
             accessorKey: "salon_id.salon_name",
-            id: "salon_name", // accessorKey might not work directly for nested sort/filter in server-side, depends on backend
+            id: "salon_name",
             header: "Salon",
             cell: ({ row }) => <div>{row.original.salon_id?.salon_name || "-"}</div>,
         },

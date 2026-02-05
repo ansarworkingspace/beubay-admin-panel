@@ -97,6 +97,31 @@ export const useUpdateStylistMutation = (id: string) => {
     });
 };
 
+export function useToggleStylistStatus(options?: {
+    onSuccess?: () => void;
+    onError?: (error: any) => void;
+}) {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (data: { id: string; currentStatus: boolean }) => {
+            await api.patch(`/admin/stylists/${data.id}/status`, {
+                is_active: !data.currentStatus
+            });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["stylists"] });
+            toast.success("Status updated successfully!");
+            options?.onSuccess?.();
+        },
+        onError: (error: any) => {
+            console.error("Toggle status error:", error);
+            const errorMessage = error?.response?.data?.message || "Failed to update status";
+            options?.onError?.(error);
+        },
+    });
+}
+
 // --- Fetch Functions ---
 
 export const getStylistDetails = async (id: string): Promise<Stylist | null> => {
