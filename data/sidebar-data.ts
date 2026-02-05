@@ -76,6 +76,12 @@ export const sidebarData: SidebarData = {
             moduleId: "settings",
         },
         {
+            title: "User Management",
+            url: "/dashboard/users",
+            icon: Users,
+            moduleId: "users",
+        },
+        {
             title: "Booking Management",
             url: "/dashboard/booking",
             icon: CalendarDays,
