@@ -29,6 +29,7 @@ import { Error as ErrorComponent } from "@/components/ui/error";
 
 import { StylistFormData } from "../../model";
 import { useUpdateStylistMutation, useStylistDetails } from "../../controller";
+import { AvailabilityForm } from "../../components/AvailabilityForm";
 import { getSalons } from "../../../salons/controller";
 import { getServiceCategories } from "../../../utility/service-category/controller";
 
@@ -48,6 +49,8 @@ export default function EditStylistPage() {
         handleSubmit,
         control,
         reset,
+        setValue,
+        getValues,
         formState: { errors },
     } = useForm<StylistFormData>({
         defaultValues: {
@@ -97,6 +100,7 @@ export default function EditStylistPage() {
                 experience_years: stylist.experience_years,
                 bio: stylist.bio,
                 service_category_ids: serviceCategoryIds,
+                availability: stylist.availability,
             });
 
             if (stylist.profile_image) {
@@ -254,6 +258,15 @@ export default function EditStylistPage() {
                         </div>
                     </FormField>
                 </FormSection>
+
+                {/* Availability */}
+                <AvailabilityForm
+                    control={control}
+                    register={register}
+                    setValue={setValue}
+                    getValues={getValues}
+                    errors={errors}
+                />
 
                 <FormActions
                     onCancel={handleCancel}

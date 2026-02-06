@@ -1,10 +1,31 @@
 
+export interface ITimeRange {
+    start_time: string; // Format: "HH:mm"
+    end_time: string;   // Format: "HH:mm"
+}
+
+export interface IDailyAvailability {
+    is_working: boolean;
+    working_hours?: ITimeRange;
+    breaks?: ITimeRange[];
+}
+
+export interface IStylistAvailability {
+    monday?: IDailyAvailability;
+    tuesday?: IDailyAvailability;
+    wednesday?: IDailyAvailability;
+    thursday?: IDailyAvailability;
+    friday?: IDailyAvailability;
+    saturday?: IDailyAvailability;
+    sunday?: IDailyAvailability;
+}
+
 export interface Stylist {
     _id: string;
     salon_id: {
         _id: string;
         salon_name: string;
-    } | string; // It might be populated or an ID string
+    } | string;
     name: string;
     email: string;
     phone: string;
@@ -13,7 +34,7 @@ export interface Stylist {
     service_category_ids: {
         _id: string;
         name: string;
-    }[] | string[]; // Populated or ID strings
+    }[] | string[];
     profile_image: string;
     average_rating: number;
     total_ratings: number;
@@ -22,6 +43,7 @@ export interface Stylist {
     is_deleted: boolean;
     created_at: string;
     updated_at: string;
+    availability?: IStylistAvailability;
 }
 
 export interface StylistFormData {
@@ -31,8 +53,9 @@ export interface StylistFormData {
     phone: string;
     experience_years: number;
     bio: string;
-    service_category_ids: string[]; // Form uses array of IDs
-    profile_image?: FileList | string; // For file upload
+    service_category_ids: string[];
+    profile_image?: FileList | string;
+    availability?: IStylistAvailability;
 }
 
 export interface StylistListResponse {

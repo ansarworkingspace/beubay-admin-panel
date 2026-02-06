@@ -27,6 +27,7 @@ import { MultiSelect } from "@/components/ui/multi-select";
 
 import { StylistFormData } from "../model";
 import { useCreateStylistMutation } from "../controller";
+import { AvailabilityForm } from "../components/AvailabilityForm";
 import { getSalons } from "../../salons/controller";
 import { getServiceCategories } from "../../utility/service-category/controller";
 
@@ -39,6 +40,8 @@ export default function CreateStylistPage() {
         register,
         handleSubmit,
         control,
+        setValue,
+        getValues,
         formState: { errors },
     } = useForm<StylistFormData>({
         defaultValues: {
@@ -215,6 +218,15 @@ export default function CreateStylistPage() {
                         </div>
                     </FormField>
                 </FormSection>
+
+                {/* Availability */}
+                <AvailabilityForm
+                    control={control}
+                    register={register}
+                    setValue={setValue}
+                    getValues={getValues}
+                    errors={errors}
+                />
 
                 <FormActions
                     onCancel={handleCancel}

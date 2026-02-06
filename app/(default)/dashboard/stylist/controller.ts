@@ -29,6 +29,10 @@ const createFormData = (data: StylistFormData) => {
         formData.append("profile_image", data.profile_image[0]);
     }
 
+    if (data.availability) {
+        formData.append("availability", JSON.stringify(data.availability));
+    }
+
     return formData;
 };
 

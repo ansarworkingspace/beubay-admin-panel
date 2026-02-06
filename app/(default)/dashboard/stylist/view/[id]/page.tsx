@@ -104,6 +104,45 @@ export default function ViewStylistPage() {
                     </FormRowTwo>
                 </FormSection>
 
+                {/* Availability Schedule */}
+                <FormSection title="Availability Schedule" description="Working hours and breaks for the week.">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        {["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"].map((day) => {
+                            const schedule = stylist.availability?.[day as keyof typeof stylist.availability];
+
+                            return (
+                                <div key={day} className={`p-4 border rounded-lg ${schedule?.is_working ? "bg-card" : "bg-muted/30"}`}>
+                                    <h4 className="font-semibold capitalize mb-2">{day}</h4>
+                                    {schedule?.is_working ? (
+                                        <div className="space-y-2 text-sm">
+                                            <div className="flex justify-between">
+                                                <span className="text-muted-foreground">Hours:</span>
+                                                <span className="font-medium">
+                                                    {schedule.working_hours?.start_time} - {schedule.working_hours?.end_time}
+                                                </span>
+                                            </div>
+                                            {schedule.breaks && schedule.breaks.length > 0 && (
+                                                <div className="pt-2 border-t mt-2">
+                                                    <span className="text-xs text-muted-foreground block mb-1">Breaks:</span>
+                                                    <ul className="space-y-1">
+                                                        {schedule.breaks.map((brk: any, idx: number) => (
+                                                            <li key={idx} className="flex justify-between text-xs">
+                                                                <span>{brk.start_time} - {brk.end_time}</span>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <span className="text-sm text-muted-foreground">Not Working</span>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </FormSection>
+
                 <FormSection title="Profile Image" description="Stylist's profile picture.">
                     <div className="flex gap-6 items-start">
                         <div className="space-y-2">
