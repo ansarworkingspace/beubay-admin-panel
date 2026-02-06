@@ -19,7 +19,7 @@ export function Tabs({ defaultValue, children, className }: { defaultValue: stri
 
 export function TabsList({ children, className }: { children: React.ReactNode, className?: string }) {
     return (
-        <div className={cn("inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground", className)}>
+        <div className={cn("inline-flex h-10 items-center justify-start rounded-none border-b bg-transparent p-0 text-muted-foreground w-full", className)}>
             {children}
         </div>
     )
@@ -35,8 +35,10 @@ export function TabsTrigger({ value, children, className }: { value: string, chi
         <button
             type="button"
             className={cn(
-                "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                isActive ? "bg-background text-foreground shadow-sm" : "hover:bg-background/50 hover:text-foreground",
+                "inline-flex items-center justify-center whitespace-nowrap border-b-2 px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                isActive
+                    ? "border-primary text-foreground"
+                    : "border-transparent hover:text-foreground hover:border-muted-foreground/50",
                 className
             )}
             onClick={() => context.setActiveTab(value)}
