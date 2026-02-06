@@ -1,8 +1,11 @@
 import api from "@/lib/api_client";
 import { SalonFormData, SalonResponse, SalonListResponse } from "./model";
+
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { ServiceListResponse } from "../services/model";
+import { StylistListResponse } from "../stylist/model";
 
 // --- Helpers ---
 const createFormData = (data: SalonFormData, isEdit: boolean = false) => {
@@ -193,6 +196,30 @@ export const getSalonDetails = async (id: string) => {
     }
 };
 
+export const getSalonServices = async (
+    salonId: string,
+    page: number = 1,
+    limit: number = 10
+): Promise<ServiceListResponse> => {
+    const response = await api.get(`/admin/services`, {
+        params: { salon_id: salonId, page, limit }
+    });
+    return response.data.data;
+};
+
+export const getSalonStylists = async (
+    salonId: string,
+    page: number = 1,
+    limit: number = 10
+): Promise<StylistListResponse> => {
+    const response = await api.get(`/admin/stylists`, {
+        params: { salon_id: salonId, page, limit }
+    });
+    return response.data.data;
+};
+
+
+
 // --- React Query Hooks ---
 
 export const useSalons = (page: number, limit: number, searchParams: Record<string, string>) => {
@@ -210,5 +237,22 @@ export const useSalonDetails = (id: string) => {
         enabled: !!id,
     });
 };
+
+export const useSalonServices = (salonId: string, page: number = 1, limit: number = 10) => {
+    return useQuery({
+        queryKey: ['salon-services', salonId, page, limit],
+        queryFn: () => getSalonServices(salonId, page, limit),
+        enabled: !!salonId,
+    });
+};
+
+export const useSalonStylists = (salonId: string, page: number = 1, limit: number = 10) => {
+    return useQuery({
+        queryKey: ['salon-stylists', salonId, page, limit],
+        queryFn: () => getSalonStylists(salonId, page, limit),
+        enabled: !!salonId,
+    });
+};
+
 
 

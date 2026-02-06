@@ -4,13 +4,16 @@ import React from 'react';
 import { useSalonDetails } from '../../controller';
 import { Loading } from "@/components/ui/loading";
 import { Error as ErrorComponent } from "@/components/ui/error";
-import { FormBreadcrumb, FormContainer, FormSection, FormRowTwo, FormField, FormTitleCard } from "@/components/shared/form/FormLayouts";
+import { FormBreadcrumb, FormContainer, FormSection, FormRowTwo, FormField } from "@/components/shared/form/FormLayouts";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { SquarePen } from 'lucide-react';
 import { useParams } from 'next/navigation';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/custom-tabs';
+import { ServicesTable } from '../components/services-table';
+import { StylistsTable } from '../components/stylists-table';
 
 export default function ViewSalonPage() {
     const params = useParams();
@@ -28,7 +31,7 @@ export default function ViewSalonPage() {
     // Format time
     const formatTime = (time: string) => {
         if (!time) return '';
-        // ample time format conversion if needed, assuming HH:mm 24h format
+        // sample time format conversion if needed, assuming HH:mm 24h format
         return time;
     };
 
@@ -48,135 +51,153 @@ export default function ViewSalonPage() {
                 </Link>
             </div>
 
-            <div className="space-y-6">
-                <FormSection title="Basic Details" description="Core information about the salon.">
-                    <FormRowTwo>
-                        <FormField label="Salon Name">
-                            <Input value={salon.salon_name} readOnly className="bg-muted" />
-                        </FormField>
-                        <FormField label="Owner Name">
-                            <Input value={salon.owner_name} readOnly className="bg-muted" />
-                        </FormField>
-                    </FormRowTwo>
-                    <FormRowTwo>
-                        <FormField label="Email">
-                            <Input value={salon.email} readOnly className="bg-muted" />
-                        </FormField>
-                        <FormField label="Phone">
-                            <Input value={salon.phone} readOnly className="bg-muted" />
-                        </FormField>
-                    </FormRowTwo>
-                    <FormRowTwo>
-                        <FormField label="Salon Category">
-                            <Input value={getName(salon.salon_category_id)} readOnly className="bg-muted" />
-                        </FormField>
-                        <FormField label="Status">
-                            <div className="flex items-center h-10">
-                                <Badge variant={salon.is_active ? "default" : "destructive"}>
-                                    {salon.is_active ? "Active" : "Inactive"}
-                                </Badge>
-                                {salon.is_verified && (
-                                    <Badge variant="secondary" className="ml-2">Verified</Badge>
-                                )}
-                            </div>
-                        </FormField>
-                    </FormRowTwo>
-                    <FormField label="Service Categories">
-                        <div className="flex flex-wrap gap-2 p-2 border rounded-md bg-muted min-h-[42px]">
-                            {salon.service_category_ids && Array.isArray(salon.service_category_ids) && salon.service_category_ids.length > 0 ? (
-                                salon.service_category_ids.map((service: any, idx: number) => (
-                                    <Badge key={idx} variant="outline" className="bg-background">
-                                        {getName(service)}
-                                    </Badge>
-                                ))
-                            ) : (
-                                <span className="text-muted-foreground text-sm">No services listed</span>
-                            )}
-                        </div>
-                    </FormField>
-                </FormSection>
+            <Tabs defaultValue="details" className="space-y-6">
+                <TabsList>
+                    <TabsTrigger value="details">Information</TabsTrigger>
+                    <TabsTrigger value="services">Services</TabsTrigger>
+                    <TabsTrigger value="stylists">Stylists</TabsTrigger>
+                </TabsList>
 
-                <FormSection title="Location" description="Address and geographical details.">
-                    <FormRowTwo>
-                        <FormField label="Country">
-                            <Input value={getName(salon.country_id)} readOnly className="bg-muted" />
-                        </FormField>
-                        <FormField label="State">
-                            <Input value={getName(salon.state_id)} readOnly className="bg-muted" />
-                        </FormField>
-                    </FormRowTwo>
-                    <FormRowTwo>
-                        <FormField label="City">
-                            <Input value={getName(salon.city_id)} readOnly className="bg-muted" />
-                        </FormField>
-                        <FormField label="Address">
-                            <Input value={salon.address} readOnly className="bg-muted" />
-                        </FormField>
-                    </FormRowTwo>
-                    {salon.location && (
-                        <FormRowTwo>
-                            <FormField label="Latitude">
-                                <Input value={salon.location.coordinates[1]} readOnly className="bg-muted" />
-                            </FormField>
-                            <FormField label="Longitude">
-                                <Input value={salon.location.coordinates[0]} readOnly className="bg-muted" />
-                            </FormField>
-                        </FormRowTwo>
-                    )}
-                </FormSection>
-
-                <FormSection title="Business Hours" description="Weekly opening hours.">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {salon.business_hours && Object.entries(salon.business_hours).map(([day, hours]: [string, any]) => (
-                            <div key={day} className="flex items-center justify-between p-3 border rounded-md bg-card/50 hover:bg-accent/5 transition-colors">
-                                <span className="capitalize font-medium text-sm">{day}</span>
-                                {hours.is_open ? (
-                                    <div className="flex items-center gap-1.5">
-                                        <Badge variant="outline" className="font-mono text-xs bg-background">
-                                            {formatTime(hours.opening_time)}
+                <TabsContent value="details">
+                    <div className="space-y-6">
+                        <FormSection title="Basic Details" description="Core information about the salon.">
+                            <FormRowTwo>
+                                <FormField label="Salon Name">
+                                    <Input value={salon.salon_name} readOnly className="bg-muted" />
+                                </FormField>
+                                <FormField label="Owner Name">
+                                    <Input value={salon.owner_name} readOnly className="bg-muted" />
+                                </FormField>
+                            </FormRowTwo>
+                            <FormRowTwo>
+                                <FormField label="Email">
+                                    <Input value={salon.email} readOnly className="bg-muted" />
+                                </FormField>
+                                <FormField label="Phone">
+                                    <Input value={salon.phone} readOnly className="bg-muted" />
+                                </FormField>
+                            </FormRowTwo>
+                            <FormRowTwo>
+                                <FormField label="Salon Category">
+                                    <Input value={getName(salon.salon_category_id)} readOnly className="bg-muted" />
+                                </FormField>
+                                <FormField label="Status">
+                                    <div className="flex items-center h-10">
+                                        <Badge variant={salon.is_active ? "default" : "destructive"}>
+                                            {salon.is_active ? "Active" : "Inactive"}
                                         </Badge>
-                                        <span className="text-muted-foreground text-xs">-</span>
-                                        <Badge variant="outline" className="font-mono text-xs bg-background">
-                                            {formatTime(hours.closing_time)}
-                                        </Badge>
+                                        {salon.is_verified && (
+                                            <Badge variant="secondary" className="ml-2">Verified</Badge>
+                                        )}
                                     </div>
-                                ) : (
-                                    <Badge variant="secondary" className="text-xs">Closed</Badge>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </FormSection>
-
-                <FormSection title="Media" description="Logo and images.">
-                    <div className="flex gap-6 items-start">
-                        <div className="space-y-2">
-                            <span className="text-sm font-medium text-muted-foreground block">Logo</span>
-                            {salon.logo_url ? (
-                                <div className="border rounded-md p-1 bg-white inline-block">
-                                    <img src={salon.logo_url} alt="Logo" className="w-32 h-32 object-contain" />
+                                </FormField>
+                            </FormRowTwo>
+                            <FormField label="Service Categories">
+                                <div className="flex flex-wrap gap-2 p-2 border rounded-md bg-muted min-h-[42px]">
+                                    {salon.service_category_ids && Array.isArray(salon.service_category_ids) && salon.service_category_ids.length > 0 ? (
+                                        salon.service_category_ids.map((service: any, idx: number) => (
+                                            <Badge key={idx} variant="outline" className="bg-background">
+                                                {getName(service)}
+                                            </Badge>
+                                        ))
+                                    ) : (
+                                        <span className="text-muted-foreground text-sm">No services listed</span>
+                                    )}
                                 </div>
-                            ) : (
-                                <div className="p-4 border rounded-md bg-muted text-sm text-muted-foreground">No Logo</div>
+                            </FormField>
+                        </FormSection>
+
+                        <FormSection title="Location" description="Address and geographical details.">
+                            <FormRowTwo>
+                                <FormField label="Country">
+                                    <Input value={getName(salon.country_id)} readOnly className="bg-muted" />
+                                </FormField>
+                                <FormField label="State">
+                                    <Input value={getName(salon.state_id)} readOnly className="bg-muted" />
+                                </FormField>
+                            </FormRowTwo>
+                            <FormRowTwo>
+                                <FormField label="City">
+                                    <Input value={getName(salon.city_id)} readOnly className="bg-muted" />
+                                </FormField>
+                                <FormField label="Address">
+                                    <Input value={salon.address} readOnly className="bg-muted" />
+                                </FormField>
+                            </FormRowTwo>
+                            {salon.location && (
+                                <FormRowTwo>
+                                    <FormField label="Latitude">
+                                        <Input value={salon.location.coordinates[1]} readOnly className="bg-muted" />
+                                    </FormField>
+                                    <FormField label="Longitude">
+                                        <Input value={salon.location.coordinates[0]} readOnly className="bg-muted" />
+                                    </FormField>
+                                </FormRowTwo>
                             )}
-                        </div>
-                        <div className="space-y-2 flex-1">
-                            <span className="text-sm font-medium text-muted-foreground block">Gallery Images</span>
-                            <div className="flex flex-wrap gap-4">
-                                {salon.images && salon.images.length > 0 ? (
-                                    salon.images.map((img, i) => (
-                                        <div key={i} className="border rounded-md p-1 bg-white">
-                                            <img src={img} alt={`Salon ${i}`} className="w-32 h-32 object-cover" />
-                                        </div>
-                                    ))
-                                ) : (
-                                    <div className="p-4 border rounded-md bg-muted text-sm text-muted-foreground w-full">No Images</div>
-                                )}
+                        </FormSection>
+
+                        <FormSection title="Business Hours" description="Weekly opening hours.">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {salon.business_hours && Object.entries(salon.business_hours).map(([day, hours]: [string, any]) => (
+                                    <div key={day} className="flex items-center justify-between p-3 border rounded-md bg-card/50 hover:bg-accent/5 transition-colors">
+                                        <span className="capitalize font-medium text-sm">{day}</span>
+                                        {hours.is_open ? (
+                                            <div className="flex items-center gap-1.5">
+                                                <Badge variant="outline" className="font-mono text-xs bg-background">
+                                                    {formatTime(hours.opening_time)}
+                                                </Badge>
+                                                <span className="text-muted-foreground text-xs">-</span>
+                                                <Badge variant="outline" className="font-mono text-xs bg-background">
+                                                    {formatTime(hours.closing_time)}
+                                                </Badge>
+                                            </div>
+                                        ) : (
+                                            <Badge variant="secondary" className="text-xs">Closed</Badge>
+                                        )}
+                                    </div>
+                                ))}
                             </div>
-                        </div>
+                        </FormSection>
+
+                        <FormSection title="Media" description="Logo and images.">
+                            <div className="flex gap-6 items-start">
+                                <div className="space-y-2">
+                                    <span className="text-sm font-medium text-muted-foreground block">Logo</span>
+                                    {salon.logo_url ? (
+                                        <div className="border rounded-md p-1 bg-white inline-block">
+                                            <img src={salon.logo_url} alt="Logo" className="w-32 h-32 object-contain" />
+                                        </div>
+                                    ) : (
+                                        <div className="p-4 border rounded-md bg-muted text-sm text-muted-foreground">No Logo</div>
+                                    )}
+                                </div>
+                                <div className="space-y-2 flex-1">
+                                    <span className="text-sm font-medium text-muted-foreground block">Gallery Images</span>
+                                    <div className="flex flex-wrap gap-4">
+                                        {salon.images && salon.images.length > 0 ? (
+                                            salon.images.map((img: string, i: number) => (
+                                                <div key={i} className="border rounded-md p-1 bg-white">
+                                                    <img src={img} alt={`Salon ${i}`} className="w-32 h-32 object-cover" />
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="p-4 border rounded-md bg-muted text-sm text-muted-foreground w-full">No Images</div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </FormSection>
                     </div>
-                </FormSection>
-            </div>
+                </TabsContent>
+
+                <TabsContent value="services">
+                    <ServicesTable salonId={id} />
+                </TabsContent>
+
+                <TabsContent value="stylists">
+                    <StylistsTable salonId={id} />
+                </TabsContent>
+            </Tabs>
         </FormContainer>
     );
 }
