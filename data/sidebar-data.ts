@@ -8,7 +8,8 @@ import {
     Scissors,
     CalendarDays,
     Star,
-    ChartPie
+    ChartPie,
+    CreditCard
 } from "lucide-react";
 
 export interface NavItem {
@@ -83,9 +84,51 @@ export const sidebarData: SidebarData = {
         },
         {
             title: "Booking Management",
-            url: "/dashboard/booking",
+            url: "#",
             icon: CalendarDays,
             moduleId: "bookings",
+            items: [
+                {
+                    title: "All Booking",
+                    url: "/dashboard/bookings",
+                },
+                {
+                    title: "Past",
+                    url: "/dashboard/bookings?type=past",
+                },
+                {
+                    title: "Upcoming",
+                    url: "/dashboard/bookings?type=upcoming",
+                }
+            ]
+        },
+        {
+            title: "Transaction Management",
+            url: "#",
+            icon: CreditCard,
+            moduleId: "transactions",
+            items: [
+                {
+                    title: "Initiated",
+                    url: "/dashboard/transactions?status=initiated",
+                },
+                {
+                    title: "Success",
+                    url: "/dashboard/transactions?status=success",
+                },
+                {
+                    title: "Failed",
+                    url: "/dashboard/transactions?status=failed",
+                },
+                {
+                    title: "Pending",
+                    url: "/dashboard/transactions?status=pending",
+                },
+                {
+                    title: "Refunded",
+                    url: "/dashboard/transactions?status=refunded",
+                }
+            ]
         },
         {
             title: "Ratings & Reviews",
