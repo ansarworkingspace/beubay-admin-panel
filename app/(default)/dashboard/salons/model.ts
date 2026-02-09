@@ -69,6 +69,7 @@ export interface SalonFormData {
         lng: number;
     }; // Will be JSON stringified to {type: 'Point', ...}
     business_hours: BusinessHours; // Will be JSON stringified
+    password?: string;
 }
 
 export interface SalonListResponse {

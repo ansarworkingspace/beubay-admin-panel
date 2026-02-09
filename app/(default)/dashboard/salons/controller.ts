@@ -17,6 +17,7 @@ const createFormData = (data: SalonFormData, isEdit: boolean = false) => {
     formData.append("email", data.email);
     formData.append("phone", data.phone);
     formData.append("address", data.address);
+    if (data.password) formData.append("password", data.password);
 
     if (data.salon_category_id) formData.append("salon_category_id", data.salon_category_id);
     if (data.country_id) formData.append("country_id", data.country_id);

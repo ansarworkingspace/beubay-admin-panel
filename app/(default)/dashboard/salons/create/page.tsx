@@ -82,6 +82,7 @@ export default function CreateSalonPage() {
             service_category_ids: [],
             location: { lat: 0, lng: 0 },
             business_hours: defaultBusinessHours,
+            password: "",
         },
     });
 
@@ -168,7 +169,7 @@ export default function CreateSalonPage() {
                                 rules={{ required: "Category is required" }}
                                 render={({ field }) => (
                                     <Select onValueChange={field.onChange} value={field.value}>
-                                        <SelectTrigger>
+                                        <SelectTrigger className="w-full">
                                             <SelectValue placeholder="Select Category" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -180,7 +181,9 @@ export default function CreateSalonPage() {
                                 )}
                             />
                         </FormField>
-                        <div />
+                        <FormField label="Password" required error={errors.password?.message}>
+                            <Input type="password" {...register("password", { required: "Password is required" })} placeholder="••••••••" />
+                        </FormField>
                     </FormRowTwo>
                 </FormSection>
 
