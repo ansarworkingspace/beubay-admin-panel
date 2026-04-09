@@ -1,4 +1,6 @@
 import { StylistTable } from './table/table';
+import { Suspense } from 'react';
+import { Loading } from '@/components/ui/loading';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 
 export default function StylistPage() {
@@ -21,7 +23,9 @@ export default function StylistPage() {
                     {/* Additional dashboard actions if needed */}
                 </div>
             </div>
-            <StylistTable />
+            <Suspense fallback={<Loading />}>
+                <StylistTable />
+            </Suspense>
         </div>
     );
 }

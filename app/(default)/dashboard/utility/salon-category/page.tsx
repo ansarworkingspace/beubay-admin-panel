@@ -1,4 +1,6 @@
 import { SalonCategoryTable } from './table/table';
+import { Suspense } from 'react';
+import { Loading } from '@/components/ui/loading';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 
 export default function SalonCategoryPage() {
@@ -25,7 +27,9 @@ export default function SalonCategoryPage() {
                     {/* Additional dashboard actions if needed */}
                 </div>
             </div>
-            <SalonCategoryTable />
+            <Suspense fallback={<Loading />}>
+                <SalonCategoryTable />
+            </Suspense>
         </div>
     );
 }

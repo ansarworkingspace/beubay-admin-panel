@@ -1,4 +1,6 @@
 import { ServiceTable } from './table/table';
+import { Suspense } from 'react';
+import { Loading } from '@/components/ui/loading';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 
 export default function ServicePage() {
@@ -21,7 +23,9 @@ export default function ServicePage() {
                     {/* Additional dashboard actions if needed */}
                 </div>
             </div>
-            <ServiceTable />
+            <Suspense fallback={<Loading />}>
+                <ServiceTable />
+            </Suspense>
         </div>
     );
 }

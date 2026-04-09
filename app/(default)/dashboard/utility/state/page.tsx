@@ -1,4 +1,6 @@
 import { StateTable } from './state-table/table';
+import { Suspense } from 'react';
+import { Loading } from '@/components/ui/loading';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 
 export default function StatePage() {
@@ -25,7 +27,9 @@ export default function StatePage() {
                     {/* Additional dashboard actions if needed */}
                 </div>
             </div>
-            <StateTable />
+            <Suspense fallback={<Loading />}>
+                <StateTable />
+            </Suspense>
         </div>
     );
 }

@@ -16,9 +16,11 @@ import { Search, Filter, SlidersHorizontal, Star } from "lucide-react";
 import { useSalonRatings, useStylistRatings } from "./controller";
 import { ReviewsList } from "./reviews-list";
 import { DataTablePagination } from "@/components/shared/table/data-table-pagination";
+import { Loading } from "@/components/ui/loading";
 import { cn } from "@/lib/utils";
+import { Suspense } from "react";
 
-export default function ReviewsPage() {
+function ReviewsContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     
@@ -174,5 +176,13 @@ export default function ReviewsPage() {
                 </div>
             )}
         </div>
+    );
+}
+
+export default function ReviewsPage() {
+    return (
+        <Suspense fallback={<Loading />}>
+            <ReviewsContent />
+        </Suspense>
     );
 }

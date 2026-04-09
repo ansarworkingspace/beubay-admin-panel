@@ -1,4 +1,6 @@
 import { ServiceCategoryTable } from './table/table';
+import { Suspense } from 'react';
+import { Loading } from '@/components/ui/loading';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 
 export default function ServiceCategoryPage() {
@@ -25,7 +27,9 @@ export default function ServiceCategoryPage() {
                     {/* Additional dashboard actions if needed */}
                 </div>
             </div>
-            <ServiceCategoryTable />
+            <Suspense fallback={<Loading />}>
+                <ServiceCategoryTable />
+            </Suspense>
         </div>
     );
 }

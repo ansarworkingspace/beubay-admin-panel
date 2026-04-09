@@ -1,4 +1,5 @@
 import { CityTable } from './city-table/table';
+import { Suspense } from 'react';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 
 export default function CityPage() {
@@ -25,7 +26,9 @@ export default function CityPage() {
                     {/* Additional dashboard actions if needed */}
                 </div>
             </div>
-            <CityTable />
+            <Suspense fallback={<div>Loading...</div>}>
+                <CityTable />
+            </Suspense>
         </div>
     );
 }
