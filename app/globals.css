@@ -25,7 +25,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-bricolage), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -206,6 +206,7 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-bricolage), system-ui, sans-serif;
   }
 }
 
@@ -231,5 +232,16 @@
     --sidebar-accent-foreground: #ffffff;
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.439 0 0);
+  }
+}
+@layer utilities {
+  @keyframes progress {
+    0% { transform: translateX(-100%) scaleX(0); }
+    50% { transform: translateX(0%) scaleX(0.5); }
+    100% { transform: translateX(100%) scaleX(0); }
+  }
+
+  .animate-progress {
+    animation: progress 1.5s infinite linear;
   }
 }

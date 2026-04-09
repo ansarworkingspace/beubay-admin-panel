@@ -132,16 +132,11 @@ export const sidebarData: SidebarData = {
         },
         {
             title: "Ratings & Reviews",
-            url: "/dashboard/review",
+            url: "/dashboard/reviews",
             icon: Star,
             moduleId: "reviews",
         },
-        {
-            title: "Reports",
-            url: "/dashboard/reports",
-            icon: ChartPie,
-            moduleId: "reports",
-        },
+
         {
             title: "Utility",
             url: "#",
