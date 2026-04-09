@@ -82,38 +82,7 @@ export default function TransactionDetailsPage() {
                         </CardContent>
                     </Card>
 
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <Server className="w-5 h-5" /> Gateway Logs
-                            </CardTitle>
-                            <CardDescription>Technical payloads exchanged with the payment provider</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                                <Label className="flex items-center gap-2 text-xs font-mono text-blue-600">
-                                    <ArrowUpRight className="w-3 h-3" /> REQUEST PAYLOAD
-                                </Label>
-                                <Textarea
-                                    value={JSON.stringify(transaction.request_payload, null, 2)}
-                                    readOnly
-                                    className="font-mono text-xs h-40 bg-slate-950 text-slate-50 border-0 resize-y focus-visible:ring-0"
-                                />
-                            </div>
-                            {transaction.response_payload && (
-                                <div className="space-y-2">
-                                    <Label className="flex items-center gap-2 text-xs font-mono text-green-600">
-                                        <ArrowDownLeft className="w-3 h-3" /> RESPONSE PAYLOAD
-                                    </Label>
-                                    <Textarea
-                                        value={JSON.stringify(transaction.response_payload, null, 2)}
-                                        readOnly
-                                        className="font-mono text-xs h-40 bg-slate-950 text-slate-50 border-0 resize-y focus-visible:ring-0"
-                                    />
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
+
                 </div>
 
                 {/* Right Column: References */}

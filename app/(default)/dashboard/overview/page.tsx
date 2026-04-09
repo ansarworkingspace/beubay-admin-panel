@@ -176,17 +176,17 @@ export default function AnalyticsOverview() {
                                 </div>
                                 
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-2">
-                                    <div className="space-y-2 p-4 rounded-xl border bg-muted/20">
+                                    <div className="space-y-2 p-4 rounded-xl border bg-muted/20 text-center">
                                         <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Confirmed</p>
-                                        <p className="text-2xl font-black">{data.bookings.confirmed}</p>
+                                        <p className="text-2xl font-black">{data.bookings?.confirmed ?? 0}</p>
                                     </div>
-                                    <div className="space-y-2 p-4 rounded-xl border bg-muted/20">
+                                    <div className="space-y-2 p-4 rounded-xl border bg-muted/20 text-center">
                                         <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">In Review</p>
-                                        <p className="text-2xl font-black text-orange-500">{data.bookings.initiated}</p>
+                                        <p className="text-2xl font-black text-orange-500">{data.bookings?.initiated ?? 0}</p>
                                     </div>
-                                    <div className="space-y-2 p-4 rounded-xl border bg-muted/20">
-                                        <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Total Stylists</p>
-                                        <p className="text-2xl font-black text-blue-500">{data.platform.total_stylists}</p>
+                                    <div className="space-y-2 p-4 rounded-xl border bg-muted/20 text-center">
+                                        <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Stylists</p>
+                                        <p className="text-2xl font-black text-blue-500">{data.platform?.total_stylists ?? 0}</p>
                                     </div>
                                 </div>
                             </CardContent>
@@ -197,24 +197,32 @@ export default function AnalyticsOverview() {
                             <CardHeader className="bg-muted/30">
                                 <CardTitle className="text-lg">Market Demand</CardTitle>
                             </CardHeader>
-                            <CardContent className="p-6 space-y-6">
-                                {data.most_used_service_categories.map((cat, idx) => (
-                                    <div key={cat.name} className="flex items-center gap-4 group cursor-default">
-                                        <div className="h-10 w-10 shrink-0 flex items-center justify-center rounded-lg bg-muted text-sm font-bold group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                                            {String(idx + 1).padStart(2, '0')}
-                                        </div>
-                                        <div className="flex-1 space-y-1">
-                                            <div className="flex justify-between">
-                                                <p className="text-sm font-bold">{cat.name}</p>
-                                                <p className="text-[10px] font-black uppercase text-muted-foreground">{cat.count} Units</p>
-                                            </div>
-                                            <Progress 
-                                                value={(cat.count / data.most_used_service_categories[0].count) * 100} 
-                                                className="h-1.5 bg-muted" 
-                                            />
-                                        </div>
+                            <CardContent className="p-6">
+                                {(!data.most_used_service_categories || data.most_used_service_categories.length === 0) ? (
+                                    <div className="flex flex-col items-center justify-center h-[200px] text-muted-foreground text-xs italic">
+                                        No service data for this period
                                     </div>
-                                ))}
+                                ) : (
+                                    <div className="space-y-6">
+                                        {data.most_used_service_categories.map((cat, idx) => (
+                                            <div key={cat.name} className="flex items-center gap-4 group cursor-default">
+                                                <div className="h-10 w-10 shrink-0 flex items-center justify-center rounded-lg bg-muted text-sm font-bold group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                                                    {String(idx + 1).padStart(2, '0')}
+                                                </div>
+                                                <div className="flex-1 space-y-1">
+                                                    <div className="flex justify-between">
+                                                        <p className="text-sm font-bold">{cat.name}</p>
+                                                        <p className="text-[10px] font-black uppercase text-muted-foreground">{cat.count} Units</p>
+                                                    </div>
+                                                    <Progress 
+                                                        value={data.most_used_service_categories[0]?.count ? (cat.count / data.most_used_service_categories[0].count) * 100 : 0} 
+                                                        className="h-1.5 bg-muted" 
+                                                    />
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
                     </div>
@@ -224,7 +232,7 @@ export default function AnalyticsOverview() {
                         <VerticalLeaderboard 
                             title="Volume Leaders" 
                             description="Ranked by total bookings"
-                            items={data.most_booked_salons.map(s => ({ 
+                            items={(data.most_booked_salons || []).map(s => ({ 
                                 label: s.salon_name, 
                                 value: `${s.count} Bookings`,
                                 icon: <MapPin className="h-3.5 w-3.5" />
@@ -233,7 +241,7 @@ export default function AnalyticsOverview() {
                         <VerticalLeaderboard 
                             title="Revenue Leaders" 
                             description="Top grossing establishments"
-                            items={data.most_revenued_salons.map(s => ({ 
+                            items={(data.most_revenued_salons || []).map(s => ({ 
                                 label: s.salon_name, 
                                 value: `$${s.total_revenue.toLocaleString()}`,
                                 icon: <DollarSign className="h-3.5 w-3.5" />
@@ -244,21 +252,27 @@ export default function AnalyticsOverview() {
                                 <CardTitle className="text-sm font-black uppercase tracking-wider text-muted-foreground">Power Users</CardTitle>
                             </CardHeader>
                             <CardContent className="p-0">
-                                {data.most_booked_users.map((user, idx) => (
-                                    <div key={user.name} className="flex items-center gap-3 px-6 py-4 border-b last:border-0 hover:bg-muted/10 transition-colors">
-                                        <Avatar className="h-9 w-9 border-2 border-background shadow-sm">
-                                            <AvatarImage src={user.profile_image} />
-                                            <AvatarFallback className="text-xs font-bold">{user.name.slice(0, 2).toUpperCase()}</AvatarFallback>
-                                        </Avatar>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-sm font-bold truncate">{user.name}</p>
-                                            <p className="text-[10px] text-muted-foreground uppercase font-black">Top Contributor</p>
-                                        </div>
-                                        <div className="h-8 w-8 flex items-center justify-center rounded-full bg-primary/5 text-xs font-black text-primary">
-                                            {user.count}
-                                        </div>
+                                {(!data.most_booked_users || data.most_booked_users.length === 0) ? (
+                                    <div className="flex items-center justify-center py-12 text-muted-foreground text-xs italic">
+                                        No user activity recorded
                                     </div>
-                                ))}
+                                ) : (
+                                    data.most_booked_users.map((user, idx) => (
+                                        <div key={user.name} className="flex items-center gap-3 px-6 py-4 border-b last:border-0 hover:bg-muted/10 transition-colors">
+                                            <Avatar className="h-9 w-9 border-2 border-background shadow-sm">
+                                                <AvatarImage src={user.profile_image} />
+                                                <AvatarFallback className="text-xs font-bold">{user.name.slice(0, 2).toUpperCase()}</AvatarFallback>
+                                            </Avatar>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-bold truncate">{user.name}</p>
+                                                <p className="text-[10px] text-muted-foreground uppercase font-black">Top Contributor</p>
+                                            </div>
+                                            <div className="h-8 w-8 flex items-center justify-center rounded-full bg-primary/5 text-xs font-black text-primary">
+                                                {user.count}
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
                             </CardContent>
                         </Card>
                     </div>
