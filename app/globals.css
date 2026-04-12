@@ -244,4 +244,48 @@
   .animate-progress {
     animation: progress 1.5s infinite linear;
   }
+
+  /* Quill Editor Styles */
+  .ql-toolbar.ql-snow {
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+    border-color: var(--border) !important;
+    background-color: var(--muted) / 50%;
+  }
+
+  .ql-container.ql-snow {
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+    border-color: var(--border) !important;
+    font-family: inherit;
+  }
+
+  .dark .ql-snow .ql-stroke {
+    stroke: var(--foreground) !important;
+  }
+
+  .dark .ql-snow .ql-fill {
+    fill: var(--foreground) !important;
+  }
+
+  .dark .ql-snow .ql-picker {
+    color: var(--foreground) !important;
+  }
+
+  .dark .ql-snow .ql-picker-options {
+    background-color: var(--card) !important;
+    border-color: var(--border) !important;
+  }
+
+  .dark .ql-editor {
+    color: var(--foreground) !important;
+  }
+
+  .shadow-premium {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  }
+
+  .dark .shadow-premium {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
 }

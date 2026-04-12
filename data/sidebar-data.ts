@@ -9,7 +9,8 @@ import {
     CalendarDays,
     Star,
     ChartPie,
-    CreditCard
+    CreditCard,
+    FileText
 } from "lucide-react";
 
 export interface NavItem {
@@ -136,7 +137,12 @@ export const sidebarData: SidebarData = {
             icon: Star,
             moduleId: "reviews",
         },
-
+        {
+            title: "Legal Admin",
+            url: "/dashboard/legal",
+            icon: FileText,
+            moduleId: "legal",
+        },
         {
             title: "Utility",
             url: "#",
