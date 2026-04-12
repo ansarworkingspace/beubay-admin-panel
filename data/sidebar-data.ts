@@ -10,7 +10,8 @@ import {
     Star,
     ChartPie,
     CreditCard,
-    FileText
+    FileText,
+    LifeBuoy
 } from "lucide-react";
 
 export interface NavItem {
@@ -136,6 +137,26 @@ export const sidebarData: SidebarData = {
             url: "/dashboard/reviews",
             icon: Star,
             moduleId: "reviews",
+        },
+        {
+            title: "Tickets",
+            url: "#",
+            icon: LifeBuoy,
+            moduleId: "tickets",
+            items: [
+                {
+                    title: "All Tickets",
+                    url: "/dashboard/tickets",
+                },
+                {
+                    title: "Open Tickets",
+                    url: "/dashboard/tickets?status=open",
+                },
+                {
+                    title: "Closed Tickets",
+                    url: "/dashboard/tickets?status=closed",
+                },
+            ]
         },
         {
             title: "Legal Admin",
